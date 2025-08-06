@@ -1,0 +1,23 @@
+<p>company-form works!</p>
+<h2>{{ companyId ? 'Editar Empresa' : 'Nueva Empresa' }}</h2>
+
+<form (ngSubmit)="saveCompany()">
+  <mat-form-field appearance="fill">
+    <mat-label>Nombre</mat-label>
+    <input matInput [(ngModel)]="companyData.nombre" name="nombre" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Descripción</mat-label>
+    <input matInput [(ngModel)]="companyData.descripcion" name="descripcion">
+  </mat-form-field>
+
+  <div class="buttons">
+    <button mat-raised-button color="primary" type="submit">
+      {{ companyId ? 'Actualizar' : 'Crear' }}
+    </button>
+    <button mat-raised-button color="warn" type="button" (click)="cancel()">
+      Cancelar
+    </button>
+  </div>
+</form>

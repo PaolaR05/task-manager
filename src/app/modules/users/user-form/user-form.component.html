@@ -1,0 +1,52 @@
+<h2>{{ userId ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
+
+<form (ngSubmit)="saveUser()">
+  <mat-form-field appearance="fill">
+    <mat-label>Nombre</mat-label>
+    <input matInput [(ngModel)]="userData.name" name="name" required>
+  </mat-form-field>
+
+<mat-form-field appearance="fill">
+  <mat-label>Apellido</mat-label>
+  <input matInput [(ngModel)]="userData.lastname" name="lastname" required>
+</mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Email</mat-label>
+    <input matInput [(ngModel)]="userData.email" name="email" required type="email">
+  </mat-form-field>
+
+<mat-form-field *ngIf="!userId" appearance="fill">
+  <mat-label>Contraseña</mat-label>
+  <input matInput 
+         [(ngModel)]="userData.password" 
+         name="password" 
+         [type]="hidePassword ? 'password' : 'text'" 
+         required>
+  <button mat-icon-button 
+          matSuffix 
+          type="button" 
+          (click)="hidePassword = !hidePassword">
+    <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+  </button>
+</mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Rol</mat-label>
+    <mat-select [(ngModel)]="userData.rol" name="rol" required>
+      <mat-option *ngFor="let r of roles" [value]="r">{{ r }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Empresa</mat-label>
+    <mat-select [(ngModel)]="userData.empresaId" name="empresaId" required>
+    <mat-option *ngFor="let e of empresas" [value]="e.id">{{ e.nombre }}</mat-option>
+    </mat-select>
+</mat-form-field>
+
+  <div class="buttons">
+    <button mat-raised-button color="primary" type="submit">{{ userId ? 'Actualizar' : 'Crear' }}</button>
+    <button mat-raised-button color="warn" type="button" (click)="cancel()">Cancelar</button>
+  </div>
+</form>
