@@ -1,5 +1,5 @@
 import { UserService } from '../../../core/services/user.service';
-import { EmpresaService } from '../../../core/services/EmpresaServices';
+import { EmpresaService } from '../../../core/services/empresaservices';
 import { Component, OnInit } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';

@@ -1,1 +1,50 @@
-<p>task-modal works!</p>
+<h2 mat-dialog-title>{{ data ? 'Editar Tarea' : 'Nueva Tarea' }}</h2>
+
+<form [formGroup]="tareaForm" (ngSubmit)="guardar()" class="task-form">
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Descripción</mat-label>
+    <textarea matInput formControlName="descripcion" rows="3"></textarea>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Ubicación</mat-label>
+    <input matInput formControlName="ubicacion" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Fecha Inicio Estimado</mat-label>
+    <input matInput [matDatepicker]="inicioPicker" formControlName="fechaInicioEstimado" />
+    <mat-datepicker-toggle matSuffix [for]="inicioPicker"></mat-datepicker-toggle>
+    <mat-datepicker #inicioPicker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Fecha Fin Estimado</mat-label>
+    <input matInput [matDatepicker]="finPicker" formControlName="fechaFinEstimado" />
+    <mat-datepicker-toggle matSuffix [for]="finPicker"></mat-datepicker-toggle>
+    <mat-datepicker #finPicker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Prioridad</mat-label>
+    <mat-select formControlName="prioridad">
+      <mat-option *ngFor="let p of prioridades" [value]="p.value">{{ p.label }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-checkbox formControlName="attachmentRequerido">Attachment Requerido</mat-checkbox>
+  <mat-checkbox formControlName="ubicacionRequeridaAlCerrar">Ubicación Requerida Al Cerrar</mat-checkbox>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Estado</mat-label>
+    <mat-select formControlName="estado">
+      <mat-option *ngFor="let e of estados" [value]="e.value">{{ e.label }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="!tareaForm.valid">Guardar</button>
+  </mat-dialog-actions>
+</form>

@@ -1,0 +1,29 @@
+.kanban-container {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+}
+
+.kanban-column {
+  flex: 1;
+  background-color: #f4f5f7;
+  border-radius: 6px;
+  padding: 12px;
+  min-height: 400px;
+}
+
+.kanban-card {
+  background-color: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: grab;
+}
+
+.bottom-actions {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 1000; /* para que esté sobre otros elementos */
+}

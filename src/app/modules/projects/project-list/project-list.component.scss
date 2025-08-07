@@ -1,0 +1,27 @@
+.project-list-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .project-card {
+    margin-bottom: 15px;
+  }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+
+      button {
+        width: 48%;
+      }
+  
+}
+
+}

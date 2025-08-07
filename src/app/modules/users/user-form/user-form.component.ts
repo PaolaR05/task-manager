@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { EmpresaService } from '../../../core/services/EmpresaServices';
+import { EmpresaService } from '../../../core/services/empresaservices';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';

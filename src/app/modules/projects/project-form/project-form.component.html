@@ -1,1 +1,72 @@
-<p>project-form works!</p>
+<mat-horizontal-stepper [linear]="true" #stepper>
+  <!-- Paso 1: Información general -->
+  <mat-step [stepControl]="paso1Group" label="Información general">
+    <form [formGroup]="paso1Group">
+      <mat-form-field appearance="fill" class="w-100">
+        <mat-label>Nombre del proyecto</mat-label>
+        <input matInput formControlName="nombre" required />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-100">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="descripcion"></textarea>
+      </mat-form-field>
+
+      <div class="button-row">
+        <button mat-button color="warn" (click)="cancelar()">Cancelar</button>
+        <button mat-button color="primary" matStepperNext>Siguiente</button>
+      </div>
+    </form>
+  </mat-step>
+
+  <!-- Paso 2: Fechas -->
+  <mat-step [stepControl]="paso2Group" label="Fechas">
+    <form [formGroup]="paso2Group">
+      <mat-form-field appearance="fill">
+        <mat-label>Fecha de inicio</mat-label>
+        <input matInput [matDatepicker]="picker1" formControlName="fechaInicio" />
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Fecha de fin</mat-label>
+        <input matInput [matDatepicker]="picker2" formControlName="fechaFin" />
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+      </mat-form-field>
+
+      <div class="button-row">
+        <button mat-button matStepperPrevious>Anterior</button>
+        <button mat-button color="warn" (click)="cancelar()">Cancelar</button>
+        <button mat-button color="primary" matStepperNext>Siguiente</button>
+      </div>
+    </form>
+  </mat-step>
+
+  <!-- Paso 3: Colaboradores -->
+  <mat-step [stepControl]="paso3Group" label="Colaboradores">
+    <form [formGroup]="paso3Group">
+      <div *ngIf="colaboradores.length > 0">
+        <mat-selection-list>
+          <mat-list-option
+            *ngFor="let col of colaboradores"
+            [value]="col.id"
+            (selectionChange)="toggleColaborador(col.id, $event)"
+          >
+            {{ col.name }} {{ col.lastname }}
+          </mat-list-option>
+        </mat-selection-list>
+      </div>
+      <div *ngIf="colaboradores.length === 0">
+        <p>No hay colaboradores disponibles.</p>
+      </div>
+
+      <div class="button-row">
+        <button mat-button matStepperPrevious>Anterior</button>
+        <button mat-button color="warn" (click)="cancelar()">Cancelar</button>
+        <button mat-button color="primary" (click)="crearProyecto()">Crear Proyecto</button>
+      </div>
+    </form>
+  </mat-step>
+</mat-horizontal-stepper>

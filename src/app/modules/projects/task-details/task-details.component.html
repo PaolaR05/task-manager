@@ -1,1 +1,18 @@
-<p>task-details works!</p>
+<h2 mat-dialog-title>Detalle de Tarea</h2>
+
+<mat-dialog-content>
+  <p><strong>Título:</strong> {{ tarea.titulo }}</p>
+  <p><strong>Descripción:</strong> {{ tarea.descripcion || 'Sin descripción' }}</p>
+  <p><strong>Estado:</strong> {{ tarea.estado }}</p>
+  <p><strong>Fecha de Creación:</strong> {{ tarea.fechaCreacion | date }}</p>
+  <p><strong>Asignados:</strong></p>
+  <ul>
+    <li *ngFor="let usuario of tarea.colaboradores">
+      {{ usuario.name }} {{ usuario.lastname }}
+    </li>
+  </ul>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cerrar()">Cerrar</button>
+</mat-dialog-actions>

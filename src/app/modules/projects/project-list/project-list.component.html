@@ -1,1 +1,26 @@
-<p>project-list works!</p>
+<div class="project-list-container">
+  <div class="header">
+    <h2>Proyectos</h2>
+
+    <button mat-raised-button color="primary" [routerLink]="['/projects/form']" style="margin-bottom: 16px;">
+      + Nuevo Proyecto
+    </button>
+  </div>
+  
+  <div *ngIf="isLoading">Cargando proyectos...</div>
+
+  <div *ngIf="!isLoading && projects.length === 0">
+    No hay proyectos registrados.
+  </div>
+
+  <mat-card *ngFor="let project of projects" class="project-card">
+    <mat-card-title>{{ project.nombre }}</mat-card-title>
+    <mat-card-content>
+      <p><strong>Descripción:</strong> {{ project.descripcion || 'Sin descripción' }}</p>
+      <p><strong>Fechas:</strong> {{ project.fechaInicio | date }} - {{ project.fechaFin | date }}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button color="accent" (click)="verKanban(project.id)">Ver Kanban</button>
+    </mat-card-actions>
+  </mat-card>
+</div>
