@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ProjectFormService } from '../../../core/services/project.services';
@@ -20,19 +20,28 @@ import {
   styleUrls: ['./project-kanban.component.scss']
 })
 export class ProjectKanbanComponent implements OnInit {
+
   projectId!: number;
 
-  // Listas de tareas por estado
   pendientes: any[] = [];
-  listas: any[] = [];  
+  listas: any[] = [];
   enProceso: any[] = [];
   finalizadas: any[] = [];
   inconclusas: any[] = [];
 
+  connectedLists = [
+    'pendientes-list',
+    'listas-list',
+    'enproceso-list',
+    'finalizadas-list',
+    'inconclusas-list'
+  ];
+
   constructor(
     private route: ActivatedRoute,
     private projectService: ProjectFormService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -40,23 +49,39 @@ export class ProjectKanbanComponent implements OnInit {
     this.cargarTareas();
   }
 
-  cargarTareas() {
-    this.projectService.obtenerTareasPorProyecto(this.projectId).subscribe(tareas => {
-      console.log('Tareas recibidas del backend:', tareas);
+  cargarTareas(): void {
+    this.projectService.obtenerTareasPorProyecto(this.projectId).subscribe({
+      next: (tareas) => {
+        const tareasNormalizadas = tareas.map(t => ({
+          id: t.Id,
+          titulo: t.Titulo,
+          descripcion: t.Descripcion,
+          estado: t.Estado,
+          proyectoId: t.ProyectoId
+        }));
 
-      // Asignar tareas según el estado numérico
-      this.pendientes = tareas.filter(t => t.estado === 0);
-      this.listas = tareas.filter(t => t.estado === 1);
-      this.enProceso = tareas.filter(t => t.estado === 2);
-      this.finalizadas = tareas.filter(t => t.estado === 3);
-      this.inconclusas = tareas.filter(t => t.estado === 4);
+        console.log('Tareas normalizadas recibidas:', tareasNormalizadas); // ✅ LOG
+
+        this.pendientes = tareasNormalizadas.filter(t => t.estado === 0);
+        this.listas = tareasNormalizadas.filter(t => t.estado === 1);
+        this.enProceso = tareasNormalizadas.filter(t => t.estado === 2);
+        this.finalizadas = tareasNormalizadas.filter(t => t.estado === 3);
+        this.inconclusas = tareasNormalizadas.filter(t => t.estado === 4);
+      },
+      error: (error) => {
+        console.error('Error al cargar tareas:', error);
+      }
     });
   }
 
-  drop(event: CdkDragDrop<any[]>) {
+  drop(event: CdkDragDrop<any[]>): void {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      this.reasignarLista(event.container.id);
     } else {
+      const tareaMovida = { ...event.previousContainer.data[event.previousIndex] };
+      const nuevoEstado = this.getEstadoPorContenedor(event.container.id);
+
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
@@ -64,15 +89,70 @@ export class ProjectKanbanComponent implements OnInit {
         event.currentIndex
       );
 
-      const tarea = event.container.data[event.currentIndex];
-      const nuevoEstado = this.getEstadoPorContenedor(event.container.id);
+      this.projectService.actualizarEstadoTarea(tareaMovida.id, nuevoEstado).subscribe({
+        next: () => {
+          tareaMovida.estado = nuevoEstado;
 
-      console.log(`Actualizando tarea ID ${tarea.id} a estado: ${nuevoEstado}`);
+          this.reasignarLista(event.previousContainer.id);
+          this.reasignarLista(event.container.id);
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al actualizar estado:', error);
 
-      this.projectService.actualizarEstadoTarea(tarea.id, nuevoEstado).subscribe(() => {
-        tarea.estado = nuevoEstado; // Actualizar estado localmente
+          // Revertir cambio visual si falla
+          transferArrayItem(
+            event.container.data,
+            event.previousContainer.data,
+            event.currentIndex,
+            event.previousIndex
+          );
+
+          this.reasignarLista(event.container.id);
+          this.reasignarLista(event.previousContainer.id);
+          this.cdr.detectChanges();
+        }
       });
     }
+  }
+
+  abrirModalTarea(): void {
+    this.dialog.open(TaskModalComponent, {
+      data: null,
+      width: '400px'
+    }).afterClosed().subscribe({
+      next: (result) => {
+        if (result) {
+          const nuevaTarea = {
+            ...result,
+            proyectoId: this.projectId,
+            estado: 0
+          };
+
+          this.projectService.crearTarea(nuevaTarea).subscribe({
+            next: (tareaCreada) => {
+              switch (tareaCreada.estado) {
+                case 0: this.pendientes.push(tareaCreada); break;
+                case 1: this.listas.push(tareaCreada); break;
+                case 2: this.enProceso.push(tareaCreada); break;
+                case 3: this.finalizadas.push(tareaCreada); break;
+                case 4: this.inconclusas.push(tareaCreada); break;
+                default: this.pendientes.push(tareaCreada);
+              }
+
+              this.reasignarLista(`pendientes-list`);
+              this.cdr.detectChanges();
+            },
+            error: (err) => {
+              console.error('Error al crear tarea:', err);
+            }
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error al cerrar modal:', err);
+      }
+    });
   }
 
   getEstadoPorContenedor(contenedorId: string): number {
@@ -86,30 +166,27 @@ export class ProjectKanbanComponent implements OnInit {
     }
   }
 
-  abrirModalTarea() {
-    this.dialog.open(TaskModalComponent, {
-      data: null,
-      width: '400px'
-    }).afterClosed().subscribe(result => {
-      if (result) {
-        const nuevaTarea = {
-          ...result,
-          proyectoId: this.projectId,
-          estado: 0 // Estado inicial: Pendiente
-        };
+  reasignarLista(listaId: string): void {
+    switch (listaId) {
+      case 'pendientes-list':
+        this.pendientes = [...this.pendientes];
+        break;
+      case 'listas-list':
+        this.listas = [...this.listas];
+        break;
+      case 'enproceso-list':
+        this.enProceso = [...this.enProceso];
+        break;
+      case 'finalizadas-list':
+        this.finalizadas = [...this.finalizadas];
+        break;
+      case 'inconclusas-list':
+        this.inconclusas = [...this.inconclusas];
+        break;
+    }
+  }
 
-        this.projectService.crearTarea(nuevaTarea).subscribe((tareaCreada) => {
-          console.log('Tarea creada:', tareaCreada);
-          switch (tareaCreada.estado) {
-            case 0: this.pendientes.push(tareaCreada); break;
-            case 1: this.listas.push(tareaCreada); break;
-            case 2: this.enProceso.push(tareaCreada); break;
-            case 3: this.finalizadas.push(tareaCreada); break;
-            case 4: this.inconclusas.push(tareaCreada); break;
-            default: this.pendientes.push(tareaCreada);
-          }
-        });
-      }
-    });
+  trackById(index: number, tarea: any): number {
+    return tarea.id;
   }
 }

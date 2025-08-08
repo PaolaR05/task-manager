@@ -38,19 +38,30 @@ export class CompanyListComponent implements OnInit {
     this.loadEmpresas();
   }
 
-  loadEmpresas() {
-    this.empresaService.getEmpresas().subscribe(empresas => {
-      this.empresas = empresas;
-      this.applyFilter();
-    });
-  }
+loadEmpresas() {
+  this.empresaService.getEmpresas().subscribe(empresas => {
+    console.log('Empresas recibidas:', empresas);
+    this.empresas = empresas.map((e: any) => ({
+      id: e.Id,
+      nombre: e.Nombre,
+      descripcion: e.Descripcion,
+      // agrega otras propiedades si las necesitas
+    }));
+    this.applyFilter();
+  });
+}
 
-  applyFilter() {
-    const filter = this.filterText.toLowerCase();
+
+applyFilter() {
+  const filter = this.filterText.toLowerCase();
+  if (!filter) {
+    this.filteredEmpresas = [...this.empresas];
+  } else {
     this.filteredEmpresas = this.empresas.filter(e =>
-      e.nombre.toLowerCase().includes(filter)
+      e.nombre && e.nombre.toLowerCase().includes(filter)
     );
   }
+}
 
   deleteEmpresa(id: number) {
     if (confirm('¿Estás seguro de eliminar esta empresa?')) {

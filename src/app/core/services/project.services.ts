@@ -19,7 +19,9 @@ export interface AsignarColaboradoresDto {
 })
 export class ProjectFormService {
 
-  private baseUrl = '/api/proyectos';
+  private baseUrl = 'http://localhost:5167/api/proyectos';
+  private tareasUrl = 'http://localhost:5167/api/tareas';
+  private usuariosUrl = 'http://localhost:5167/api/usuarios';
 
   constructor(private http: HttpClient) {}
 
@@ -32,24 +34,27 @@ export class ProjectFormService {
   }
 
   obtenerColaboradoresDisponibles(): Observable<any> {
-    // Llama a tu endpoint para obtener usuarios colaboradores (filtrados por empresa)
-    return this.http.get('/api/usuarios/colaboradores');
+    return this.http.get(`${this.usuariosUrl}/colaboradores`);
   }
 
   obtenerProyectos(): Observable<any[]> {
-  return this.http.get<any[]>(this.baseUrl);
-}
+    return this.http.get<any[]>(this.baseUrl);
+  }
 
-obtenerTareasPorProyecto(proyectoId: number): Observable<any[]> {
-    return this.http.get<any[]>(`/api/tareas/por-proyecto/${proyectoId}`);
-}
+  obtenerTareasPorProyecto(proyectoId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.tareasUrl}/por-proyecto/${proyectoId}`);
+  }
 
-actualizarEstadoTarea(tareaId: number, nuevoEstado: number): Observable<any> {
-  return this.http.put(`/api/tareas/${tareaId}/estado`, { estado: nuevoEstado });
-}
+  actualizarEstadoTarea(tareaId: number, nuevoEstado: number): Observable<any> {
+    return this.http.patch(`${this.tareasUrl}/${tareaId}/estado`, { nuevoEstado });
+  }
 
 crearTarea(tarea: any): Observable<any> {
-  return this.http.post('/api/tareas', tarea);
+  return this.http.post(this.tareasUrl, tarea);
 }
 
+
+  eliminarProyecto(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
 }

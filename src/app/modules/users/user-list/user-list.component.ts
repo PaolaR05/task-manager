@@ -17,29 +17,44 @@ export class UserListComponent implements OnInit {
   empresas: any[] = [];
   displayedColumns = ['id', 'name', 'email', 'rol', 'empresa', 'actions'];
 
-  constructor(private userService: UserService, private empresaService: EmpresaService) {}
+  constructor(
+    private userService: UserService,
+    private empresaService: EmpresaService
+  ) {}
 
   ngOnInit() {
     this.empresaService.getEmpresas().subscribe(empresas => {
-      this.empresas = empresas;
+      console.log('Empresas crudas:', empresas); // <-- Log inicial
+
+      // Mapeo para adaptar mayúsculas a minúsculas
+      this.empresas = empresas.map(e => ({
+        id: e.Id,
+        nombre: e.Nombre,
+        descripcion: e.Descripcion
+      }));
+
+      console.log('Empresas procesadas:', this.empresas); // <-- Log después del mapeo
+
       this.loadUsers();
     });
   }
 
   loadUsers() {
-    this.userService.getUsers().subscribe(users => {
-      this.users = users.map(u => ({
-        ...u,
-        empresaNombre: this.empresas.find(e => e.id == u.empresaId)?.nombre || '-'
-      }));
-    });
-  }
-deleteUser(userId: number) {
-  if (confirm('¿Estás seguro de eliminar este usuario?')) {
-    this.userService.deleteUser(userId).subscribe(() => {
-      // Recargar la lista de usuarios después de eliminar
-      this.loadUsers();
-    });
-  }
+  this.userService.getUsers().subscribe(users => {
+    console.log('Usuarios recibidos:', users); // para confirmar estructura
+
+    this.users = users.map(u => ({
+      ...u,
+      empresaNombre: this.empresas.find(e => e.id == u.EmpresaId)?.nombre || '-'
+    }));
+  });
 }
+
+  deleteUser(userId: number) {
+    if (confirm('¿Estás seguro de eliminar este usuario?')) {
+      this.userService.deleteUser(userId).subscribe(() => {
+        this.loadUsers();
+      });
+    }
+  }
 }
