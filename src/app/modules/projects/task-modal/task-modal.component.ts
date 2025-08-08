@@ -32,40 +32,41 @@ export class TaskModalComponent {
   tareaForm: FormGroup;
 
   prioridades = [
-    { value: 'Baja', label: 'Baja' },
-    { value: 'Media', label: 'Media' },
-    { value: 'Alta', label: 'Alta' }
-  ];
-
-  estados = [
-    { value: 'Pendiente', label: 'Pendiente' },
-    { value: 'Lista', label: 'Lista' },
-    { value: 'EnProceso', label: 'En Proceso' },
-    { value: 'Finalizada', label: 'Finalizada' },
-    { value: 'Inconclusa', label: 'Inconclusa' }
+    { value: 0, label: 'Baja' },
+    { value: 1, label: 'Media' },
+    { value: 2, label: 'Alta' }
   ];
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<TaskModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any // Puede ser null para nueva tarea o un objeto para edición
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.tareaForm = this.fb.group({
       descripcion: [data?.descripcion || '', Validators.required],
       ubicacion: [data?.ubicacion || ''],
-      fechaInicioEstimado: [data?.fechaInicioEstimado ? new Date(data.fechaInicioEstimado) : ''],
-      fechaFinEstimado: [data?.fechaFinEstimado ? new Date(data.fechaFinEstimado) : ''],
-      prioridad: [data?.prioridad || 'Media', Validators.required],
+      fechaInicioEstimado: [data?.fechaInicioEstimado ? new Date(data.fechaInicioEstimado) : null],
+      fechaFinEstimado: [data?.fechaFinEstimado ? new Date(data.fechaFinEstimado) : null],
+      prioridad: [typeof data?.prioridad === 'number' ? data.prioridad : 1, Validators.required], // 1 = Media
       attachmentRequerido: [data?.attachmentRequerido || false],
-      ubicacionRequeridaAlCerrar: [data?.ubicacionRequeridaAlCerrar || false],
-      estado: [data?.estado || 'Pendiente']
+      ubicacionRequeridaAlCerrar: [data?.ubicacionRequeridaAlCerrar || false]
     });
   }
 
   guardar() {
-    if (this.tareaForm.valid) {
-      this.dialogRef.close(this.tareaForm.value);
-    }
+    if (this.tareaForm.invalid) return;
+
+    const formValue = this.tareaForm.value;
+
+    this.dialogRef.close({
+      descripcion: formValue.descripcion,
+      ubicacion: formValue.ubicacion,
+      fechaInicioEstimado: formValue.fechaInicioEstimado ? formValue.fechaInicioEstimado.toISOString() : null,
+      fechaFinEstimado: formValue.fechaFinEstimado ? formValue.fechaFinEstimado.toISOString() : null,
+      prioridad: formValue.prioridad,
+      attachmentRequerido: formValue.attachmentRequerido,
+      ubicacionRequeridaAlCerrar: formValue.ubicacionRequeridaAlCerrar
+    });
   }
 
   cancelar() {

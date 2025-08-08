@@ -57,4 +57,9 @@ crearTarea(tarea: any): Observable<any> {
   eliminarProyecto(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
+
+  eliminarTarea(tareaId: number): Observable<any> {
+  return this.http.delete(`${this.tareasUrl}/${tareaId}`);
+}
+
 }
