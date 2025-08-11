@@ -47,7 +47,7 @@ export class TaskModalComponent {
       ubicacion: [data?.ubicacion || ''],
       fechaInicioEstimado: [data?.fechaInicioEstimado ? new Date(data.fechaInicioEstimado) : null],
       fechaFinEstimado: [data?.fechaFinEstimado ? new Date(data.fechaFinEstimado) : null],
-      prioridad: [typeof data?.prioridad === 'number' ? data.prioridad : 1, Validators.required], // 1 = Media
+      prioridad: [typeof data?.prioridad === 'number' ? data.prioridad : 1, Validators.required],
       attachmentRequerido: [data?.attachmentRequerido || false],
       ubicacionRequeridaAlCerrar: [data?.ubicacionRequeridaAlCerrar || false]
     });

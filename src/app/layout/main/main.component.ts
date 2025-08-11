@@ -29,9 +29,9 @@ export class MainComponent implements OnInit {
   constructor(public auth: AuthService) {}
 
   ngOnInit() {
-    // Inicializa el usuario desde BehaviorSubject
+    
     this.user = this.auth.userSubject.value;
-    console.log('Usuario actual:', this.user);//verificar si llega todo el json
+    console.log('Usuario actual:', this.user); //revisar los datos del jsn
     
     this.auth.user$.subscribe(u => {
       this.user = u;

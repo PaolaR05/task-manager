@@ -22,16 +22,29 @@
   <!-- Paso 2: Fechas -->
   <mat-step [stepControl]="paso2Group" label="Fechas">
     <form [formGroup]="paso2Group">
-      <mat-form-field appearance="fill">
+      <!-- Fecha de inicio -->
+      <mat-form-field appearance="fill" class="w-100">
         <mat-label>Fecha de inicio</mat-label>
-        <input matInput [matDatepicker]="picker1" formControlName="fechaInicio" />
+        <input
+          matInput
+          [matDatepicker]="picker1"
+          formControlName="fechaInicio"
+          [min]="minFechaInicio"
+          (dateChange)="onFechaInicioChange($event.value)"
+        />
         <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
         <mat-datepicker #picker1></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field appearance="fill">
+      <!-- Fecha de fin -->
+      <mat-form-field appearance="fill" class="w-100">
         <mat-label>Fecha de fin</mat-label>
-        <input matInput [matDatepicker]="picker2" formControlName="fechaFin" />
+        <input
+          matInput
+          [matDatepicker]="picker2"
+          formControlName="fechaFin"
+          [min]="minFechaFin"
+        />
         <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
         <mat-datepicker #picker2></mat-datepicker>
       </mat-form-field>
@@ -54,7 +67,7 @@
             [value]="col.id"
             (selectionChange)="toggleColaborador(col.id, $event)"
           >
-            {{ col.name }} {{ col.lastname }}
+            {{ col.Name }} {{ col.Lastname }}
           </mat-list-option>
         </mat-selection-list>
       </div>

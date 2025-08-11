@@ -1,12 +1,38 @@
-mat-dialog-content {
-  padding-top: 10px;
-  font-size: 14px;
+.task-detail-content .container {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;    /* baja a columna en pantallas pequeñas */
+}
 
-  p {
-    margin: 8px 0;
-  }
+.task-detail-content .info-section,
+.task-detail-content .comments-section {
+  flex: 1 1 45%;
+  min-width: 280px;
+  max-height: 400px;
+  overflow-y: auto;
+}
 
-  ul {
-    padding-left: 20px;
-  }
+.comments-list {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.comment-item {
+  margin-bottom: 12px;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.no-comments {
+  font-style: italic;
+  color: #999;
+}
+
+.new-comment-section {
+  margin-top: 16px;
 }

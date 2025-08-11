@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-loading-spinner',
-  standalone: true,
-  imports: [],
   templateUrl: './loading-spinner.component.html',
-  styleUrl: './loading-spinner.component.scss'
+  styleUrls: ['./loading-spinner.component.scss'],
+  standalone: true,  // si usas standalone components
+  imports: [CommonModule, MatProgressSpinnerModule]
 })
 export class LoadingSpinnerComponent {
-
+  @Input() visible = false;
 }

@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CompanyService {
-  private apiUrl = 'http://localhost:5167/api/Empresas'; // tu backend de empresas
+  private apiUrl = 'http://localhost:5167/api/Empresas'; 
 
   constructor(private http: HttpClient) {}
 

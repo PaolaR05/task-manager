@@ -17,14 +17,12 @@ export interface User {
 })
 export class AuthService {
   private apiUrl = 'http://localhost:5167/api/auth';
-  
-  // BehaviorSubject con usuario inicial desde token
   public userSubject = new BehaviorSubject<User | null>(this.getUserFromToken());
   public user$ = this.userSubject.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  // Login
+
   login(email: string, password: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, { email, password }).pipe(
       tap((res: any) => {
@@ -34,19 +32,18 @@ export class AuthService {
     );
   }
 
-  // Logout
   logout() {
     localStorage.removeItem('token');
     this.userSubject.next(null);
     this.router.navigate(['/login']);
   }
 
-  // Obtener token
+
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  // Verificar si está logueado
+
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
@@ -59,6 +56,7 @@ export class AuthService {
     try {
       const payload: any = JSON.parse(atob(token.split('.')[1]));
       return {
+
         id: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || null,
         name: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || null,
         email: payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || null,

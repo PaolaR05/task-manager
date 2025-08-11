@@ -1,18 +1,50 @@
 <h2 mat-dialog-title>Detalle de Tarea</h2>
 
-<mat-dialog-content>
-  <p><strong>Título:</strong> {{ tarea.titulo }}</p>
-  <p><strong>Descripción:</strong> {{ tarea.descripcion || 'Sin descripción' }}</p>
-  <p><strong>Estado:</strong> {{ tarea.estado }}</p>
-  <p><strong>Fecha de Creación:</strong> {{ tarea.fechaCreacion | date }}</p>
-  <p><strong>Asignados:</strong></p>
-  <ul>
-    <li *ngFor="let usuario of tarea.colaboradores">
-      {{ usuario.name }} {{ usuario.lastname }}
-    </li>
-  </ul>
+<mat-dialog-content class="task-detail-content">
+
+  <div class="container">
+    <section class="info-section">
+      <h3>Información</h3>
+      <p><strong>Descripción:</strong> {{ tarea.descripcion }}</p>
+      <p><strong>Ubicación:</strong> {{ tarea.ubicacion || 'No especificada' }}</p>
+      <p><strong>Estado:</strong> {{ tarea.estado }}</p>
+      <p><strong>Fecha Inicio Estimado:</strong> {{ tarea.fechaInicioEstimado | date:'mediumDate' }}</p>
+      <p><strong>Fecha Fin Estimado:</strong> {{ tarea.fechaFinEstimado | date:'mediumDate' }}</p>
+    </section>
+
+    <section class="comments-section">
+      <h3>Comentarios</h3>
+      <div *ngIf="tarea.comentarios?.length > 0; else sinComentarios" class="comments-list">
+        <div *ngFor="let c of tarea.comentarios" class="comment-item">
+          <div class="comment-header">
+            <strong>{{ c.usuarioNombre }}</strong>
+            <small>{{ c.fechaComentario | date:'short' }}</small>
+          </div>
+          <p>{{ c.comentarioTexto }}</p>
+          <mat-divider></mat-divider>
+        </div>
+      </div>
+      <ng-template #sinComentarios>
+        <p class="no-comments">No hay comentarios.</p>
+      </ng-template>
+
+      <!-- Muevo el nuevo comentario dentro de comments-section -->
+      <section class="new-comment-section">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nuevo Comentario</mat-label>
+          <textarea matInput [(ngModel)]="nuevoComentario" rows="2"  placeholder="Escribe un comentario..."></textarea>
+        </mat-form-field>
+      </section>
+
+    </section>
+  </div>
+
+  <app-loading-spinner [visible]="loading"></app-loading-spinner>
+
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-button (click)="cerrar()">Cerrar</button>
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-stroked-button color="primary" (click)="editar()" [disabled]="loading">Editar</button>
+  <button mat-stroked-button color="warn" (click)="cerrar()" [disabled]="loading">Cerrar</button>
+  <button mat-flat-button color="accent" (click)="enviarComentario()" [disabled]="!nuevoComentario || loading">Enviar Comentario</button>
 </mat-dialog-actions>

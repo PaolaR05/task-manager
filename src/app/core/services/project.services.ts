@@ -62,4 +62,19 @@ crearTarea(tarea: any): Observable<any> {
   return this.http.delete(`${this.tareasUrl}/${tareaId}`);
 }
 
+agregarComentario(tareaId: number, comentarioTexto: string): Observable<any> {
+  const comentario = { comentarioTexto };  // Enviar como objeto con la propiedad 'comentarioTexto'
+  return this.http.post(`${this.tareasUrl}/${tareaId}/comentarios`, comentario, {
+    headers: { 'Content-Type': 'application/json' }
+  });
 }
+
+
+obtenerDetalleTarea(tareaId: number): Observable<any> {
+  return this.http.get<any>(`${this.tareasUrl}/${tareaId}`);
+}
+actualizarTarea(tareaId: number, datosActualizados: any): Observable<any> {
+  return this.http.put(`${this.tareasUrl}/${tareaId}`, datosActualizados);
+}
+}
+

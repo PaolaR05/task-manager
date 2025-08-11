@@ -7,9 +7,12 @@
        [cdkDropListConnectedTo]="connectedLists"
        (cdkDropListDropped)="drop($event)">
     <h3>Pendientes</h3>
-    <div class="kanban-card" *ngFor="let tarea of pendientes; trackBy: trackById" cdkDrag>
+    <div class="kanban-card" 
+         *ngFor="let tarea of pendientes; trackBy: trackById" 
+         cdkDrag
+         (click)="abrirDetalleTarea(tarea.id)">
       {{ tarea.descripcion }}
-      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 0)">
+      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 0); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
@@ -23,9 +26,12 @@
        [cdkDropListConnectedTo]="connectedLists"
        (cdkDropListDropped)="drop($event)">
     <h3>Listas</h3>
-    <div class="kanban-card" *ngFor="let tarea of listas; trackBy: trackById" cdkDrag>
+    <div class="kanban-card" 
+         *ngFor="let tarea of listas; trackBy: trackById" 
+         cdkDrag
+         (click)="abrirDetalleTarea(tarea.id)">
       {{ tarea.descripcion }}
-      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 1)">
+      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 1); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
@@ -39,9 +45,12 @@
        [cdkDropListConnectedTo]="connectedLists"
        (cdkDropListDropped)="drop($event)">
     <h3>En Proceso</h3>
-    <div class="kanban-card" *ngFor="let tarea of enProceso; trackBy: trackById" cdkDrag>
+    <div class="kanban-card" 
+         *ngFor="let tarea of enProceso; trackBy: trackById" 
+         cdkDrag
+         (click)="abrirDetalleTarea(tarea.id)">
       {{ tarea.descripcion }}
-      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 2)">
+      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 2); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
@@ -55,9 +64,12 @@
        [cdkDropListConnectedTo]="connectedLists"
        (cdkDropListDropped)="drop($event)">
     <h3>Finalizadas</h3>
-    <div class="kanban-card" *ngFor="let tarea of finalizadas; trackBy: trackById" cdkDrag>
+    <div class="kanban-card" 
+         *ngFor="let tarea of finalizadas; trackBy: trackById" 
+         cdkDrag
+         (click)="abrirDetalleTarea(tarea.id)">
       {{ tarea.descripcion }}
-      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 3)">
+      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 3); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
@@ -71,9 +83,12 @@
        [cdkDropListConnectedTo]="connectedLists"
        (cdkDropListDropped)="drop($event)">
     <h3>Inconclusas</h3>
-    <div class="kanban-card" *ngFor="let tarea of inconclusas; trackBy: trackById" cdkDrag>
+    <div class="kanban-card" 
+         *ngFor="let tarea of inconclusas; trackBy: trackById" 
+         cdkDrag
+         (click)="abrirDetalleTarea(tarea.id)">
       {{ tarea.descripcion }}
-      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 4)">
+      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 4); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>

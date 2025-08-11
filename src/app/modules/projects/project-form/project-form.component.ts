@@ -13,6 +13,9 @@ export class ProjectFormComponent implements OnInit {
   colaboradores: any[] = [];
   seleccionados: number[] = [];
 
+  minFechaInicio: Date = new Date();
+  minFechaFin: Date | null = null;
+
   constructor(
     private fb: FormBuilder,
     private projectService: ProjectFormService,
@@ -24,8 +27,8 @@ export class ProjectFormComponent implements OnInit {
         descripcion: ['']
       }),
       paso2: this.fb.group({
-        fechaInicio: [''],
-        fechaFin: ['']
+        fechaInicio: ['', Validators.required],
+        fechaFin: ['', Validators.required]
       }),
       paso3: this.fb.group({
         colaboradores: [[]]
@@ -51,7 +54,7 @@ export class ProjectFormComponent implements OnInit {
 
   cargarColaboradores() {
     this.projectService.obtenerColaboradoresDisponibles().subscribe(data => {
-    console.log('Colaboradores recibidos:', data);
+      console.log('Colaboradores recibidos:', data);
       this.colaboradores = data;
     });
   }
@@ -63,6 +66,22 @@ export class ProjectFormComponent implements OnInit {
       this.seleccionados = this.seleccionados.filter(x => x !== id);
     }
     this.stepperForm.get('paso3.colaboradores')?.setValue(this.seleccionados);
+  }
+
+  onFechaInicioChange(fechaInicio: Date | null): void {
+    if (fechaInicio) {
+      this.minFechaFin = fechaInicio;
+
+      const fechaFinControl = this.paso2Group.get('fechaFin');
+      const fechaFin = fechaFinControl?.value;
+
+      // Si fechaFin es anterior a fechaInicio, la reseteamos
+      if (fechaFin && new Date(fechaFin) < fechaInicio) {
+        fechaFinControl?.setValue(null);
+      }
+    } else {
+      this.minFechaFin = null;
+    }
   }
 
   crearProyecto() {

@@ -1,0 +1,21 @@
+.cliente-container {
+  position: relative;
+  padding: 16px;
+}
+
+.crear-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.cliente-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 60px;
+}
+
+.cliente-card {
+  width: 300px;
+}

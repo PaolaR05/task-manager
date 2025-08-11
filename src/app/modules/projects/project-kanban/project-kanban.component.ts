@@ -12,6 +12,7 @@ import {
   transferArrayItem,
   DragDropModule
 } from '@angular/cdk/drag-drop';
+import { TaskDetailComponent } from '../task-details/task-details.component';
 
 @Component({
   standalone: true,
@@ -54,11 +55,15 @@ export class ProjectKanbanComponent implements OnInit {
     this.projectService.obtenerTareasPorProyecto(this.projectId).subscribe({
       next: (tareas) => {
         const tareasNormalizadas = tareas.map(t => ({
-          id: t.Id,
-          titulo: t.Titulo,
-          descripcion: t.Descripcion,
-          estado: t.Estado,
-          proyectoId: t.ProyectoId
+        id: t.Id,
+        titulo: t.Titulo,
+        descripcion: t.Descripcion,
+        estado: t.Estado,
+        proyectoId: t.ProyectoId,
+        ubicacion: t.Ubicacion,
+        fechaInicioEstimado: t.FechaInicioEstimado,
+        fechaFinEstimado: t.FechaFinEstimado,
+        comentarios: t.Comentarios || []  
         }));
 
         console.log('Tareas normalizadas recibidas:', tareasNormalizadas);
@@ -130,7 +135,7 @@ export class ProjectKanbanComponent implements OnInit {
             Ubicacion: result.ubicacion || null,
             FechaInicioEstimado: result.fechaInicioEstimado || null,
             FechaFinEstimado: result.fechaFinEstimado || null,
-            Prioridad: result.prioridad !== undefined ? result.prioridad : 1, // 1 = Media
+            Prioridad: result.prioridad !== undefined ? result.prioridad : 1,
             AttachmentRequerido: result.attachmentRequerido || false,
             UbicacionRequeridaAlCerrar: result.ubicacionRequeridaAlCerrar || false
           };
@@ -151,6 +156,51 @@ export class ProjectKanbanComponent implements OnInit {
         console.error('Error al cerrar modal:', err);
       }
     });
+  }
+
+  editarTarea(tarea: any): void {
+    this.dialog.open(TaskModalComponent, {
+      data: tarea,
+      width: '400px'
+    }).afterClosed().subscribe({
+      next: (result) => {
+        if (result) {
+          const tareaActualizada = {
+            Descripcion: result.descripcion || '',
+            Ubicacion: result.ubicacion || null,
+            FechaInicioEstimado: result.fechaInicioEstimado || null,
+            FechaFinEstimado: result.fechaFinEstimado || null,
+            Prioridad: result.prioridad !== undefined ? result.prioridad : 1,
+            AttachmentRequerido: result.attachmentRequerido || false,
+            UbicacionRequeridaAlCerrar: result.ubicacionRequeridaAlCerrar || false
+          };
+
+          this.projectService.actualizarTarea(tarea.id, tareaActualizada).subscribe({
+            next: (tareaEditada) => {
+              this.actualizarTareaEnListas(tareaEditada);
+              this.cdr.detectChanges();
+            },
+            error: (err) => {
+              console.error('Error al actualizar tarea:', err);
+            }
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error al cerrar modal de edición:', err);
+      }
+    });
+  }
+
+  actualizarTareaEnListas(tareaActualizada: any): void {
+    const listas = [this.pendientes, this.listas, this.enProceso, this.finalizadas, this.inconclusas];
+    for (const lista of listas) {
+      const index = lista.findIndex(t => t.id === tareaActualizada.id);
+      if (index !== -1) {
+        lista[index] = { ...lista[index], ...tareaActualizada };
+        break;
+      }
+    }
   }
 
   moverTareaDeEstado(tarea: any, estadoAnterior: number, estadoNuevo: number) {
@@ -235,7 +285,7 @@ export class ProjectKanbanComponent implements OnInit {
   }
 
   eliminarTarea(tarea: any, estado: number): void {
-     console.log('Eliminar tarea con id:', tarea.id);  // <-- Verifica aquí el id
+    console.log('Eliminar tarea con id:', tarea.id);
     if (!confirm('¿Seguro que deseas eliminar esta tarea?')) return;
 
     this.projectService.eliminarTarea(tarea.id).subscribe({
@@ -249,4 +299,33 @@ export class ProjectKanbanComponent implements OnInit {
       }
     });
   }
+
+abrirDetalleTarea(tareaId: number): void {
+  this.projectService.obtenerDetalleTarea(tareaId).subscribe({
+    next: (detalle) => {
+      const tareaNormalizada = {
+        id: detalle.Id,
+        descripcion: detalle.Descripcion,
+        ubicacion: detalle.Ubicacion,
+        estado: detalle.Estado,
+        proyectoId: detalle.ProyectoId,
+        fechaInicioEstimado: detalle.FechaInicioEstimado,
+        fechaFinEstimado: detalle.FechaFinEstimado,
+        comentarios: detalle.Comentarios || []
+      };
+
+      this.dialog.open(TaskDetailComponent, {
+        data: tareaNormalizada,
+        width: '900px',
+        maxWidth: '90vw'
+      });
+    },
+    error: (err) => {
+      console.error('Error al obtener detalle de tarea:', err);
+    }
+  });
 }
+
+}
+
+

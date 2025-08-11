@@ -1,0 +1,28 @@
+<h2>{{ clienteId ? 'Editar Cliente' : 'Nuevo Cliente' }}</h2>
+
+<form (ngSubmit)="saveCliente()" #clienteForm="ngForm">
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Nombre</mat-label>
+    <input matInput [(ngModel)]="clienteData.Nombre" name="nombre" required #nombre="ngModel" />
+    <mat-error *ngIf="nombre.invalid && nombre.touched">El nombre es requerido</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Correo</mat-label>
+    <input matInput [(ngModel)]="clienteData.Correo" name="correo" type="email" required #correo="ngModel" />
+    <mat-error *ngIf="correo.invalid && correo.touched">Correo válido es requerido</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Teléfono</mat-label>
+    <input matInput [(ngModel)]="clienteData.Telefono" name="telefono" required #telefono="ngModel" />
+    <mat-error *ngIf="telefono.invalid && telefono.touched">Teléfono es requerido</mat-error>
+  </mat-form-field>
+
+  <div class="buttons">
+    <button mat-raised-button color="primary" type="submit" [disabled]="clienteForm.invalid">
+      {{ clienteId ? 'Actualizar' : 'Crear' }}
+    </button>
+    <button mat-raised-button color="warn" type="button" (click)="cancel()">Cancelar</button>
+  </div>
+</form>
