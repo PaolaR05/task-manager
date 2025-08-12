@@ -1,1 +1,63 @@
-<p>dashboard works!</p>
+<div class="stat-cards-container">
+  <mat-card class="stat-card">
+    <mat-card-header>
+      <mat-card-title>Proyectos</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Resumen de los proyectos cargados</p>
+
+      <!-- Mostrar mensaje de error si ocurre alguno -->
+      <p *ngIf="error" class="error-message">{{ error }}</p>
+
+      <!-- Mostrar lista de proyectos cuando haya datos -->
+      <p *ngIf="!proyectos.length && !loading && !error">No hay proyectos disponibles.</p>
+
+      <div *ngIf="proyectos.length">
+        <mat-list>
+          <mat-list-item *ngFor="let proyecto of proyectos">
+            <h3 mat-line>{{ proyecto.nombre }}</h3>
+            <p mat-line>{{ proyecto.descripcion }}</p>
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Card para Total de Colaboradores -->
+  <mat-card class="stat-card">
+    <mat-card-header>
+      <mat-card-title>Total Colaboradores</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ totalColaboradores }} colaboradores activos</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Card para Total de Empresas -->
+  <mat-card class="stat-card">
+    <mat-card-header>
+      <mat-card-title>Total Empresas</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ totalEmpresas }} empresas registradas</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Card para Total de Clientes -->
+  <mat-card class="stat-card">
+    <mat-card-header>
+      <mat-card-title>Total Clientes</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ totalClientes}} clientes registrados</p>
+    </mat-card-content>
+  </mat-card> 
+</div>
+
+<!-- Spinner de carga -->
+<mat-progress-spinner *ngIf="loading" mode="indeterminate" aria-live="assertive"></mat-progress-spinner>
+
+<!-- Calendario de FullCalendar -->
+<div class="full-calendar-container" *ngIf="!loading">
+  <full-calendar [options]="calendarOptions"></full-calendar>
+</div>

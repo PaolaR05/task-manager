@@ -10,6 +10,8 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
     provideAnimations(),
-    provideHttpClient(withInterceptors([jwtInterceptor])) 
+    provideHttpClient(
+      withInterceptors([jwtInterceptor]) 
+    )
   ]
 }).catch(err => console.error(err));

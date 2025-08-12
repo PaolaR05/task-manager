@@ -2,6 +2,24 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+
+export interface Proyecto {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  fechaInicio?: string;
+  fechaFin?: string;
+}
+
+export interface Tarea {
+  id: number;
+  descripcion: string;
+  fechaInicioEstimado: string;
+  fechaFinEstimado?: string;
+  estado: number;
+  proyectoId: number;
+}
+
 export interface CreateProyectoDto {
   nombre: string;
   descripcion: string;
@@ -77,4 +95,3 @@ actualizarTarea(tareaId: number, datosActualizados: any): Observable<any> {
   return this.http.put(`${this.tareasUrl}/${tareaId}`, datosActualizados);
 }
 }
-

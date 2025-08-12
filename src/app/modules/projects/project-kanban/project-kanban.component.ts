@@ -51,6 +51,16 @@ export class ProjectKanbanComponent implements OnInit {
     this.cargarTareas();
   }
 
+  getEstadoNombre(estado: number): string {
+  switch (estado) {
+    case 0: return 'Pendiente';
+    case 1: return 'Listas';
+    case 2: return 'En Proceso';
+    case 3: return 'Finalizadas';
+    case 4: return 'Inconclusas';
+    default: return 'Desconocido';
+  }
+}
   cargarTareas(): void {
     this.projectService.obtenerTareasPorProyecto(this.projectId).subscribe({
       next: (tareas) => {
@@ -307,7 +317,7 @@ abrirDetalleTarea(tareaId: number): void {
         id: detalle.Id,
         descripcion: detalle.Descripcion,
         ubicacion: detalle.Ubicacion,
-        estado: detalle.Estado,
+      estado: this.getEstadoNombre(detalle.Estado),
         proyectoId: detalle.ProyectoId,
         fechaInicioEstimado: detalle.FechaInicioEstimado,
         fechaFinEstimado: detalle.FechaFinEstimado,
@@ -327,5 +337,4 @@ abrirDetalleTarea(tareaId: number): void {
 }
 
 }
-
 

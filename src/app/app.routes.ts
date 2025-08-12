@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from '../app/core/guards/auth.guard';
+import { authGuard } from './core/guards/auth.guard';
 import { MainComponent } from './layout/main/main.component';
 import { LoginComponent } from './modules/auth/login/login.component';
 
@@ -15,8 +15,7 @@ export const routes: Routes = [
       { path: 'companies', loadChildren: () => import('./modules/companies/companies.module').then(m => m.CompaniesModule) },
       { path: 'users', loadChildren: () => import('./modules/users/users.module').then(m => m.UsersModule) },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'customers', loadChildren: () => import('./modules/customers/customers.module').then(m => m.CustomersModule) 
-}
+      { path: 'customers', loadChildren: () => import('./modules/customers/customers.module').then(m => m.CustomersModule) }
     ]
   },
   { path: '**', redirectTo: '' }
