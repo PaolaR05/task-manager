@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
 
 export interface Proyecto {
   id: number;
@@ -43,6 +42,7 @@ export class ProjectFormService {
 
   constructor(private http: HttpClient) {}
 
+  // --- Métodos de Proyectos ---
   crearProyecto(dto: CreateProyectoDto): Observable<any> {
     return this.http.post(this.baseUrl, dto);
   }
@@ -59,39 +59,72 @@ export class ProjectFormService {
     return this.http.get<any[]>(this.baseUrl);
   }
 
-  obtenerTareasPorProyecto(proyectoId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.tareasUrl}/por-proyecto/${proyectoId}`);
-  }
-
-  actualizarEstadoTarea(tareaId: number, nuevoEstado: number): Observable<any> {
-    return this.http.patch(`${this.tareasUrl}/${tareaId}/estado`, { nuevoEstado });
-  }
-
-crearTarea(tarea: any): Observable<any> {
-  return this.http.post(this.tareasUrl, tarea);
-}
-
-
   eliminarProyecto(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 
-  eliminarTarea(tareaId: number): Observable<any> {
-  return this.http.delete(`${this.tareasUrl}/${tareaId}`);
-}
+  // --- Métodos de Tareas ---
+  obtenerTareasPorProyecto(proyectoId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.tareasUrl}/por-proyecto/${proyectoId}`);
+  }
 
-agregarComentario(tareaId: number, comentarioTexto: string): Observable<any> {
-  const comentario = { comentarioTexto };  // Enviar como objeto con la propiedad 'comentarioTexto'
+  crearTarea(tarea: any): Observable<any> {
+    return this.http.post(this.tareasUrl, tarea, { headers: this.getAuthHeaders() });
+  }
+
+  actualizarEstadoTarea(tareaId: number, nuevoEstado: number): Observable<any> {
+    return this.http.patch(`${this.tareasUrl}/${tareaId}/estado`, { nuevoEstado }, { headers: this.getAuthHeaders() });
+  }
+
+  eliminarTarea(tareaId: number): Observable<any> {
+    return this.http.delete(`${this.tareasUrl}/${tareaId}`, { headers: this.getAuthHeaders() });
+  }
+
+ agregarComentario(tareaId: number, comentarioTexto: string): Observable<any> {
+  const token = localStorage.getItem('token');
+  const comentario = { comentarioTexto };
+  
   return this.http.post(`${this.tareasUrl}/${tareaId}/comentarios`, comentario, {
-    headers: { 'Content-Type': 'application/json' }
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  });
+}
+  obtenerDetalleTarea(tareaId: number): Observable<any> {
+    return this.http.get<any>(`${this.tareasUrl}/${tareaId}`, { headers: this.getAuthHeaders() });
+  }
+
+  actualizarTarea(tareaId: number, datosActualizados: any): Observable<any> {
+    return this.http.put(`${this.tareasUrl}/${tareaId}`, datosActualizados, { headers: this.getAuthHeaders() });
+  }
+
+  // --- Método privado para agregar token ---
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });
+  }
+
+  getTareaConComentarios(tareaId: number) {
+  const token = localStorage.getItem('token');
+  return this.http.get<any>(`${this.tareasUrl}/${tareaId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
   });
 }
 
+subirAdjunto(tareaId: number, formData: FormData): Observable<any> {
+  const token = localStorage.getItem('token');
+  return this.http.post(`${this.tareasUrl}/${tareaId}/adjuntos`, formData, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+}
 
-obtenerDetalleTarea(tareaId: number): Observable<any> {
-  return this.http.get<any>(`${this.tareasUrl}/${tareaId}`);
-}
-actualizarTarea(tareaId: number, datosActualizados: any): Observable<any> {
-  return this.http.put(`${this.tareasUrl}/${tareaId}`, datosActualizados);
-}
 }

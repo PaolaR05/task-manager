@@ -1,3 +1,4 @@
+
 import { Component, Inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,11 +7,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
-import { ProjectFormService } from '../../../core/services/project.services';
-import { TaskModalComponent } from '../task-modal/task-modal.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LoadingSpinnerComponent } from "../../../shared/components/loading-spinner/loading-spinner.component";
-import { AuthService } from '../../../core/services/auth.services'; // Importa el servicio de autenticación
+import { AuthService } from '../../../core/services/auth.services';
+import { TaskModalComponent } from '../task-modal/task-modal.component';
+import { ProjectFormService } from '../../../core/services/project.services';
 
 @Component({
   standalone: true,
@@ -33,84 +34,123 @@ export class TaskDetailComponent implements OnInit {
   tarea: any;
   nuevoComentario: string = '';
   loading = false;
-  usuarioAutenticado = false; // Flag para saber si el usuario está autenticado
+  usuarioAutenticado = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private dialogRef: MatDialogRef<TaskDetailComponent>,
     private tareaService: ProjectFormService,
     private dialog: MatDialog,
-    private authService: AuthService, // Inyecta el servicio AuthService
-    private cdr: ChangeDetectorRef // Inyecta ChangeDetectorRef para manejar la actualización de vista
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.tarea = this.data;  // Asigna los datos pasados desde el modal
-    this.usuarioAutenticado = this.authService.isLoggedIn();  // Verifica si el usuario está autenticado
+    this.tarea = this.data;
+    this.usuarioAutenticado = this.authService.isLoggedIn();
+
+    // Inicializar comentarios como array vacío si es undefined
+    if (!this.tarea.comentarios) this.tarea.comentarios = [];
+
   }
 
   cerrar() {
     this.dialogRef.close();
   }
 
-  // Método para enviar comentario
   enviarComentario() {
-    if (!this.nuevoComentario) return;
-
+    if (!this.nuevoComentario.trim()) return;
     if (!this.usuarioAutenticado) {
       console.error("El usuario no está autenticado");
-      return; // No dejar enviar comentario si no está autenticado
+      return;
+    }
+
+    if (!this.tarea?.id) {
+      console.error('La tarea aún no se ha cargado. Espera unos segundos.');
+      return;
     }
 
     this.loading = true;
-    this.tareaService.agregarComentario(this.tarea.id, this.nuevoComentario).subscribe({
-      next: (comentario) => {
-        // Asegúrate de solo agregar lo que necesitas
-        this.tarea.comentarios.push({
-          usuarioNombre: comentario.usuarioNombre, // Asegúrate de que esto coincida con tu DTO
-          comentarioTexto: comentario.comentarioTexto,
-          fechaComentario: comentario.fechaComentario
+
+    this.tareaService.agregarComentario(this.tarea.id, this.nuevoComentario)
+      .subscribe({
+        next: (comentario) => {
+          if (!this.tarea.comentarios) this.tarea.comentarios = [];
+          this.tarea.comentarios.push({
+            usuarioNombre: comentario.UsuarioNombre ?? 'Desconocido',
+            comentarioTexto: comentario.ComentarioTexto,
+            fechaComentario: comentario.fechaComentario
+          });
+          this.nuevoComentario = '';
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error('Error al enviar comentario:', err);
+          this.loading = false;
+        }
+      });
+  }
+
+  editar() {
+    if (!this.usuarioAutenticado) {
+      console.error("El usuario no está autenticado");
+      return;
+    }
+
+    this.dialog.open(TaskModalComponent, {
+      data: this.tarea,
+      width: '400px',
+    }).afterClosed().subscribe((actualizada) => {
+      if (actualizada) {
+        Object.assign(this.tarea, actualizada);
+
+        this.loading = true;
+        this.tareaService.actualizarTarea(this.tarea.id, this.tarea).subscribe({
+          next: (tareaActualizada) => {
+            this.tarea = tareaActualizada;
+            this.loading = false;
+            this.dialogRef.close(tareaActualizada);
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            console.error('Error al actualizar la tarea:', err);
+            this.loading = false;
+          }
         });
-        this.nuevoComentario = '';
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error al enviar comentario:', err);
-        this.loading = false;
       }
     });
   }
 
-  // Método para editar tarea
-  editar() {
-  if (!this.usuarioAutenticado) {
-    console.error("El usuario no está autenticado");
-    return;
-  }
 
-  this.dialog.open(TaskModalComponent, {
-    data: this.tarea,  
-    width: '400px',    
-  }).afterClosed().subscribe((actualizada) => {
-    if (actualizada) {
-      Object.assign(this.tarea, actualizada);  // Actualiza localmente
+  archivoSeleccionado: File | null = null;
 
-      // Actualiza la tarea en el backend
-      this.loading = true;
-      this.tareaService.actualizarTarea(this.tarea.id, this.tarea).subscribe({
-        next: (tareaActualizada) => {
-          this.tarea = tareaActualizada;  // Actualiza la tarea con la respuesta
-          this.loading = false;
-
-          // Cierra el modal y pasa la tarea actualizada
-          this.dialogRef.close(tareaActualizada);
-        },
-        error: (err) => {
-          console.error('Error al actualizar la tarea:', err);
-          this.loading = false;
-        }
-      });
-    }
-  });
+seleccionarArchivo(event: any) {
+  this.archivoSeleccionado = event.target.files[0] ?? null;
 }
+
+subirArchivo() {
+  if (!this.archivoSeleccionado) return;
+  if (!this.tarea?.id) return;
+
+  this.loading = true;
+
+  const formData = new FormData();
+  formData.append('archivo', this.archivoSeleccionado);
+
+  this.tareaService.subirAdjunto(this.tarea.id, formData)
+    .subscribe({
+      next: (adjunto) => {
+        if (!this.tarea.adjuntos) this.tarea.adjuntos = [];
+        this.tarea.adjuntos.push(adjunto);
+        this.archivoSeleccionado = null;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error al subir archivo:', err);
+        this.loading = false;
+      }
+    });
 }
+
+}  

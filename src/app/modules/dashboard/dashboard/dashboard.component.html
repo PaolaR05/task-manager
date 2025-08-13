@@ -1,30 +1,16 @@
 <div class="stat-cards-container">
+  <!-- Total Proyectos: visible para todos -->
   <mat-card class="stat-card">
     <mat-card-header>
-      <mat-card-title>Proyectos</mat-card-title>
+      <mat-card-title>Total Proyectos</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <p>Resumen de los proyectos cargados</p>
-
-      <!-- Mostrar mensaje de error si ocurre alguno -->
-      <p *ngIf="error" class="error-message">{{ error }}</p>
-
-      <!-- Mostrar lista de proyectos cuando haya datos -->
-      <p *ngIf="!proyectos.length && !loading && !error">No hay proyectos disponibles.</p>
-
-      <div *ngIf="proyectos.length">
-        <mat-list>
-          <mat-list-item *ngFor="let proyecto of proyectos">
-            <h3 mat-line>{{ proyecto.nombre }}</h3>
-            <p mat-line>{{ proyecto.descripcion }}</p>
-          </mat-list-item>
-        </mat-list>
-      </div>
+      <p>{{ totalProyectos }} proyectos registrados</p>
     </mat-card-content>
   </mat-card>
 
-  <!-- Card para Total de Colaboradores -->
-  <mat-card class="stat-card">
+  <!-- Total Colaboradores: superadmin y admin_empresa -->
+  <mat-card *ngIf="rolUsuario === 'superadmin' || rolUsuario === 'admin_empresa'" class="stat-card">
     <mat-card-header>
       <mat-card-title>Total Colaboradores</mat-card-title>
     </mat-card-header>
@@ -33,8 +19,8 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Card para Total de Empresas -->
-  <mat-card class="stat-card">
+  <!-- Total Empresas: solo superadmin -->
+  <mat-card *ngIf="rolUsuario === 'superadmin'" class="stat-card">
     <mat-card-header>
       <mat-card-title>Total Empresas</mat-card-title>
     </mat-card-header>
@@ -43,15 +29,15 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Card para Total de Clientes -->
-  <mat-card class="stat-card">
+  <!-- Total Clientes: superadmin y admin_empresa -->
+  <mat-card *ngIf="rolUsuario === 'superadmin' || rolUsuario === 'admin_empresa'" class="stat-card">
     <mat-card-header>
       <mat-card-title>Total Clientes</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <p>{{ totalClientes}} clientes registrados</p>
+      <p>{{ totalClientes }} clientes registrados</p>
     </mat-card-content>
-  </mat-card> 
+  </mat-card>
 </div>
 
 <!-- Spinner de carga -->

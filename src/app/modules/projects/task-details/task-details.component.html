@@ -1,8 +1,9 @@
 <h2 mat-dialog-title>Detalle de Tarea</h2>
 
 <mat-dialog-content class="task-detail-content">
-
   <div class="container">
+
+    <!-- Sección de Información -->
     <section class="info-section">
       <h3>Información</h3>
       <p><strong>Descripción:</strong> {{ tarea.descripcion }}</p>
@@ -10,37 +11,60 @@
       <p><strong>Estado:</strong> {{ tarea.estado }}</p>
       <p><strong>Fecha Inicio Estimado:</strong> {{ tarea.fechaInicioEstimado | date:'mediumDate' }}</p>
       <p><strong>Fecha Fin Estimado:</strong> {{ tarea.fechaFinEstimado | date:'mediumDate' }}</p>
+    
+        <!-- Sección de Adjuntos -->
+    <section class="attachments-section">
+      <h3>Adjuntos</h3>
+
+      <input type="file" (change)="seleccionarArchivo($event)" />
+      <button mat-flat-button color="primary" (click)="subirArchivo()" [disabled]="!archivoSeleccionado || loading">
+        Subir Archivo
+      </button>
+
+      <div class="adjuntos-list" *ngIf="tarea.adjuntos?.length > 0; else sinAdjuntos">
+        <div *ngFor="let a of tarea.adjuntos">
+          <a [href]="a.archivoUrl" target="_blank">{{ a.nombreArchivo }}</a>
+          <small>{{ a.fechaSubida | date:'short' }}</small>
+        </div>
+      </div>
+      <ng-template #sinAdjuntos>
+        <p class="no-attachments">No hay adjuntos.</p>
+      </ng-template>
+    </section>
+    
     </section>
 
+    <!-- Sección de Comentarios -->
     <section class="comments-section">
       <h3>Comentarios</h3>
+
       <div *ngIf="tarea.comentarios?.length > 0; else sinComentarios" class="comments-list">
         <div *ngFor="let c of tarea.comentarios" class="comment-item">
           <div class="comment-header">
-            <strong>{{ c.usuarioNombre }}</strong>
-            <small>{{ c.fechaComentario | date:'short' }}</small>
+            <strong>{{ c.UsuarioNombre }}</strong>
+            <small>{{ c.FechaComentario | date:'short' }}</small>
           </div>
-          <p>{{ c.comentarioTexto }}</p>
+          <p>{{ c.ComentarioTexto }}</p>
           <mat-divider></mat-divider>
         </div>
       </div>
+
       <ng-template #sinComentarios>
         <p class="no-comments">No hay comentarios.</p>
       </ng-template>
 
-      <!-- Muevo el nuevo comentario dentro de comments-section -->
+      <!-- Nuevo Comentario -->
       <section class="new-comment-section">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Nuevo Comentario</mat-label>
-          <textarea matInput [(ngModel)]="nuevoComentario" rows="2"  placeholder="Escribe un comentario..."></textarea>
+          <textarea matInput [(ngModel)]="nuevoComentario" rows="2" placeholder="Escribe un comentario..."></textarea>
         </mat-form-field>
       </section>
-
     </section>
+
   </div>
 
   <app-loading-spinner [visible]="loading"></app-loading-spinner>
-
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="dialog-actions">
