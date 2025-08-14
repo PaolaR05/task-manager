@@ -1,10 +1,12 @@
 <h2>Lista de Usuarios</h2>
 
-<button mat-raised-button color="primary" [routerLink]="['/users/form']" style="margin-bottom: 16px;">
-  + Nuevo Usuario
-</button>
-
-<table mat-table [dataSource]="users" class="mat-elevation-z8" style="width: 100%;">
+<div style="margin-bottom: 16px; display: flex; align-items: center;">
+  <input matInput placeholder="Buscar usuario..." [(ngModel)]="filterText" (input)="applyFilter()" style="width: 300px; margin-right: 16px;">
+  <button mat-raised-button color="primary" [routerLink]="['/users/form']">
+    + Nuevo Usuario
+  </button>
+</div>
+<table mat-table [dataSource]="filteredUsers" class="mat-elevation-z8" style="width: 100%;">
 
   <!-- ID -->
   <ng-container matColumnDef="id">
@@ -45,7 +47,6 @@
     </td>
   </ng-container>
 
-  <!-- Filas -->
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>

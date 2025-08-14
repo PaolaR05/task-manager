@@ -1,11 +1,13 @@
 <h2>Empresas</h2>
 
-<button mat-raised-button color="primary" [routerLink]="['/companies/form']" style="margin-bottom: 16px;">
-  + Nueva Empresa
-</button>
+<div class="filter-container" style="margin-bottom: 16px; display: flex; align-items: center; gap: 16px;">
+  <input matInput placeholder="Buscar empresa..." [(ngModel)]="filterText" (input)="applyFilter()" style="width: 300px;">
+  <button mat-raised-button color="primary" [routerLink]="['/companies/form']">
+    + Nueva Empresa
+  </button>
+</div>
 
 <table mat-table [dataSource]="filteredEmpresas" class="mat-elevation-z8" style="width: 100%;">
-
   <!-- ID -->
   <ng-container matColumnDef="id">
     <th mat-header-cell *matHeaderCellDef> ID </th>

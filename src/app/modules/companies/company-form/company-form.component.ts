@@ -35,7 +35,10 @@ export class CompanyFormComponent implements OnInit {
       if (params['id']) {
         this.companyId = +params['id'];
         this.empresaService.getEmpresa(this.companyId).subscribe(company => {
-          this.companyData = company;
+          this.companyData = {
+            nombre: company.Nombre || '',
+            descripcion: company.Descripcion || ''
+          };
         });
       }
     });

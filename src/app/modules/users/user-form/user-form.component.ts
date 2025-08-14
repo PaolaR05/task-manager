@@ -4,11 +4,20 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { UserService } from '../../../core/services/user.service';
 import { CommonModule } from '@angular/common';
-import { MatIcon } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
+
+interface UserData {
+  name: string;
+  lastname: string;
+  email: string;
+  password: string;
+  rol: string;
+  empresaId: number | null;
+}
 
 @Component({
   selector: 'app-user-form',
@@ -22,15 +31,24 @@ import { MatIcon } from '@angular/material/icon';
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
-    MatIcon,
+    MatIconModule,
     FormsModule
   ]
 })
 export class UserFormComponent implements OnInit {
   userId: number | null = null;
-  hidePassword = true; 
-  userData = { name: '', lastname: '', email: '', password: '', rol: 'colaborador', empresaId: null };
-  roles = ['superadmin', 'admin_empresa', 'colaborador']; 
+  hidePassword = true;
+
+  userData: UserData = {
+    name: '',
+    lastname: '',
+    email: '',
+    password: '',
+    rol: 'colaborador',
+    empresaId: null // empieza en null hasta que el usuario seleccione
+  };
+
+  roles = ['superadmin', 'admin_empresa', 'colaborador'];
   empresas: any[] = [];
 
   constructor(
@@ -41,24 +59,39 @@ export class UserFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Primero cargamos las empresas
+    // Cargar empresas primero
     this.empresaService.getEmpresas().subscribe(empresas => {
-      this.empresas = empresas;
-      
-      // Luego si es edición, cargamos el usuario
+      // Asegurarse que los IDs sean números
+      this.empresas = empresas.map(e => ({ ...e, id: Number(e.Id) }));
+
+      // Si es edición, cargar usuario
       this.route.params.subscribe(params => {
         if (params['id']) {
           this.userId = +params['id'];
           this.userService.getUser(this.userId).subscribe(user => {
-            this.userData = user;
+            this.userData = {
+              name: user.Name || '',
+              lastname: user.Lastname || '',
+              email: user.Email || '',
+              password: '',
+              rol: user.Rol || 'colaborador',
+              empresaId: user.EmpresaId != null ? Number(user.EmpresaId) : null
+            };
           });
         }
       });
-
     });
   }
 
-  saveUser() {
+  saveUser(form: NgForm) {
+    if (form.invalid) return;
+
+    // Validar empresa seleccionada
+    if (this.userData.empresaId == null) {
+      alert('Selecciona una empresa');
+      return;
+    }
+
     if (this.userId) {
       this.userService.updateUser(this.userId, this.userData).subscribe(() => {
         this.router.navigate(['/users']);
