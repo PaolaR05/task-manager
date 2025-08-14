@@ -42,30 +42,30 @@ export class ProjectFormService {
 
   constructor(private http: HttpClient) {}
 
-  // --- Métodos de Proyectos ---
+  // --- Proyectos ---
   crearProyecto(dto: CreateProyectoDto): Observable<any> {
-    return this.http.post(this.baseUrl, dto);
+    return this.http.post(this.baseUrl, dto, { headers: this.getAuthHeaders() });
   }
 
   asignarColaboradores(dto: AsignarColaboradoresDto): Observable<any> {
-    return this.http.post(`${this.baseUrl}/asignar-colaboradores`, dto);
+    return this.http.post(`${this.baseUrl}/asignar-colaboradores`, dto, { headers: this.getAuthHeaders() });
   }
 
   obtenerColaboradoresDisponibles(): Observable<any> {
-    return this.http.get(`${this.usuariosUrl}/colaboradores`);
+    return this.http.get(`${this.usuariosUrl}/colaboradores`, { headers: this.getAuthHeaders() });
   }
 
   obtenerProyectos(): Observable<any[]> {
-    return this.http.get<any[]>(this.baseUrl);
+    return this.http.get<any[]>(this.baseUrl, { headers: this.getAuthHeaders() });
   }
 
   eliminarProyecto(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+    return this.http.delete(`${this.baseUrl}/${id}`, { headers: this.getAuthHeaders() });
   }
 
-  // --- Métodos de Tareas ---
+  // --- Tareas ---
   obtenerTareasPorProyecto(proyectoId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.tareasUrl}/por-proyecto/${proyectoId}`);
+    return this.http.get<any[]>(`${this.tareasUrl}/por-proyecto/${proyectoId}`, { headers: this.getAuthHeaders() });
   }
 
   crearTarea(tarea: any): Observable<any> {
@@ -73,24 +73,18 @@ export class ProjectFormService {
   }
 
   actualizarEstadoTarea(tareaId: number, nuevoEstado: number): Observable<any> {
-    return this.http.patch(`${this.tareasUrl}/${tareaId}/estado`, { nuevoEstado }, { headers: this.getAuthHeaders() });
+    // Enviar directamente el número del enum
+    return this.http.patch(`${this.tareasUrl}/${tareaId}/estado`, nuevoEstado, { headers: this.getAuthHeaders() });
   }
 
   eliminarTarea(tareaId: number): Observable<any> {
     return this.http.delete(`${this.tareasUrl}/${tareaId}`, { headers: this.getAuthHeaders() });
   }
 
- agregarComentario(tareaId: number, comentarioTexto: string): Observable<any> {
-  const token = localStorage.getItem('token');
-  const comentario = { comentarioTexto };
-  
-  return this.http.post(`${this.tareasUrl}/${tareaId}/comentarios`, comentario, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  });
-}
+  agregarComentario(tareaId: number, comentarioTexto: string): Observable<any> {
+    return this.http.post(`${this.tareasUrl}/${tareaId}/comentarios`, { comentarioTexto }, { headers: this.getAuthHeaders() });
+  }
+
   obtenerDetalleTarea(tareaId: number): Observable<any> {
     return this.http.get<any>(`${this.tareasUrl}/${tareaId}`, { headers: this.getAuthHeaders() });
   }
@@ -99,32 +93,19 @@ export class ProjectFormService {
     return this.http.put(`${this.tareasUrl}/${tareaId}`, datosActualizados, { headers: this.getAuthHeaders() });
   }
 
-  // --- Método privado para agregar token ---
-  private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+  subirAdjunto(tareaId: number, formData: FormData): Observable<any> {
+    return this.http.post(`${this.tareasUrl}/${tareaId}/adjuntos`, formData, {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`
+      })
     });
   }
 
-  getTareaConComentarios(tareaId: number) {
-  const token = localStorage.getItem('token');
-  return this.http.get<any>(`${this.tareasUrl}/${tareaId}`, {
-    headers: {
+  private getAuthHeaders(): HttpHeaders {
+    return new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    }
-  });
-}
-
-subirAdjunto(tareaId: number, formData: FormData): Observable<any> {
-  const token = localStorage.getItem('token');
-  return this.http.post(`${this.tareasUrl}/${tareaId}/adjuntos`, formData, {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
-}
+      Authorization: `Bearer ${localStorage.getItem('token') || ''}`
+    });
+  }
 
 }

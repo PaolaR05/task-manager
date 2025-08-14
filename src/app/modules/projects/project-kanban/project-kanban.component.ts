@@ -6,12 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TaskModalComponent } from '../task-modal/task-modal.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  CdkDragDrop,
-  moveItemInArray,
-  transferArrayItem,
-  DragDropModule
-} from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem, DragDropModule } from '@angular/cdk/drag-drop';
 import { TaskDetailComponent } from '../task-details/task-details.component';
 
 @Component({
@@ -24,7 +19,6 @@ import { TaskDetailComponent } from '../task-details/task-details.component';
 export class ProjectKanbanComponent implements OnInit {
 
   projectId!: number;
-
   pendientes: any[] = [];
   listas: any[] = [];
   enProceso: any[] = [];
@@ -52,31 +46,30 @@ export class ProjectKanbanComponent implements OnInit {
   }
 
   getEstadoNombre(estado: number): string {
-  switch (estado) {
-    case 0: return 'Pendiente';
-    case 1: return 'Listas';
-    case 2: return 'En Proceso';
-    case 3: return 'Finalizadas';
-    case 4: return 'Inconclusas';
-    default: return 'Desconocido';
+    switch (estado) {
+      case 0: return 'Pendiente';
+      case 1: return 'Listas';
+      case 2: return 'En Proceso';
+      case 3: return 'Finalizadas';
+      case 4: return 'Inconclusas';
+      default: return 'Desconocido';
+    }
   }
-}
+
   cargarTareas(): void {
     this.projectService.obtenerTareasPorProyecto(this.projectId).subscribe({
       next: (tareas) => {
         const tareasNormalizadas = tareas.map(t => ({
-        id: t.Id,
-        titulo: t.Titulo,
-        descripcion: t.Descripcion,
-        estado: t.Estado,
-        proyectoId: t.ProyectoId,
-        ubicacion: t.Ubicacion,
-        fechaInicioEstimado: t.FechaInicioEstimado,
-        fechaFinEstimado: t.FechaFinEstimado,
-        comentarios: t.Comentarios || []  
+          id: t.Id,
+          titulo: t.Titulo,
+          descripcion: t.Descripcion,
+          estado: t.Estado,
+          proyectoId: t.ProyectoId,
+          ubicacion: t.Ubicacion,
+          fechaInicioEstimado: t.FechaInicioEstimado,
+          fechaFinEstimado: t.FechaFinEstimado,
+          comentarios: t.Comentarios || []
         }));
-
-        console.log('Tareas normalizadas recibidas:', tareasNormalizadas);
 
         this.pendientes = tareasNormalizadas.filter(t => t.estado === 0);
         this.listas = tareasNormalizadas.filter(t => t.estado === 1);
@@ -84,9 +77,7 @@ export class ProjectKanbanComponent implements OnInit {
         this.finalizadas = tareasNormalizadas.filter(t => t.estado === 3);
         this.inconclusas = tareasNormalizadas.filter(t => t.estado === 4);
       },
-      error: (error) => {
-        console.error('Error al cargar tareas:', error);
-      }
+      error: (error) => console.error('Error al cargar tareas:', error)
     });
   }
 
@@ -108,157 +99,26 @@ export class ProjectKanbanComponent implements OnInit {
       this.projectService.actualizarEstadoTarea(tareaMovida.id, nuevoEstado).subscribe({
         next: () => {
           tareaMovida.estado = nuevoEstado;
-
           this.reasignarLista(event.previousContainer.id);
           this.reasignarLista(event.container.id);
           this.cdr.detectChanges();
         },
-        error: (error) => {
-          console.error('Error al actualizar estado:', error);
-
-          // Revertir cambio visual si falla
+        error: () => {
           transferArrayItem(
             event.container.data,
             event.previousContainer.data,
             event.currentIndex,
             event.previousIndex
           );
-
-          this.reasignarLista(event.container.id);
           this.reasignarLista(event.previousContainer.id);
+          this.reasignarLista(event.container.id);
           this.cdr.detectChanges();
         }
       });
     }
   }
 
-  abrirModalTarea(): void {
-    this.dialog.open(TaskModalComponent, {
-      data: null,
-      width: '400px'
-    }).afterClosed().subscribe({
-      next: (result) => {
-        if (result) {
-          const nuevaTarea = {
-            ProyectoId: this.projectId,
-            Descripcion: result.descripcion || '',
-            Ubicacion: result.ubicacion || null,
-            FechaInicioEstimado: result.fechaInicioEstimado || null,
-            FechaFinEstimado: result.fechaFinEstimado || null,
-            Prioridad: result.prioridad !== undefined ? result.prioridad : 1,
-            AttachmentRequerido: result.attachmentRequerido || false,
-            UbicacionRequeridaAlCerrar: result.ubicacionRequeridaAlCerrar || false
-          };
-
-          this.projectService.crearTarea(nuevaTarea).subscribe({
-            next: (tareaCreada) => {
-              this.pendientes.push(tareaCreada);
-              this.reasignarLista('pendientes-list');
-              this.cdr.detectChanges();
-            },
-            error: (err) => {
-              console.error('Error al crear tarea:', err);
-            }
-          });
-        }
-      },
-      error: (err) => {
-        console.error('Error al cerrar modal:', err);
-      }
-    });
-  }
-
-  editarTarea(tarea: any): void {
-    this.dialog.open(TaskModalComponent, {
-      data: tarea,
-      width: '400px'
-    }).afterClosed().subscribe({
-      next: (result) => {
-        if (result) {
-          const tareaActualizada = {
-            Descripcion: result.descripcion || '',
-            Ubicacion: result.ubicacion || null,
-            FechaInicioEstimado: result.fechaInicioEstimado || null,
-            FechaFinEstimado: result.fechaFinEstimado || null,
-            Prioridad: result.prioridad !== undefined ? result.prioridad : 1,
-            AttachmentRequerido: result.attachmentRequerido || false,
-            UbicacionRequeridaAlCerrar: result.ubicacionRequeridaAlCerrar || false
-          };
-
-          this.projectService.actualizarTarea(tarea.id, tareaActualizada).subscribe({
-            next: (tareaEditada) => {
-              this.actualizarTareaEnListas(tareaEditada);
-              this.cdr.detectChanges();
-            },
-            error: (err) => {
-              console.error('Error al actualizar tarea:', err);
-            }
-          });
-        }
-      },
-      error: (err) => {
-        console.error('Error al cerrar modal de edición:', err);
-      }
-    });
-  }
-
-  actualizarTareaEnListas(tareaActualizada: any): void {
-    const listas = [this.pendientes, this.listas, this.enProceso, this.finalizadas, this.inconclusas];
-    for (const lista of listas) {
-      const index = lista.findIndex(t => t.id === tareaActualizada.id);
-      if (index !== -1) {
-        lista[index] = { ...lista[index], ...tareaActualizada };
-        break;
-      }
-    }
-  }
-
-  moverTareaDeEstado(tarea: any, estadoAnterior: number, estadoNuevo: number) {
-    this.quitarTareaDeLista(tarea.id, estadoAnterior);
-
-    tarea.estado = estadoNuevo;
-
-    switch (estadoNuevo) {
-      case 0: this.pendientes.push(tarea); break;
-      case 1: this.listas.push(tarea); break;
-      case 2: this.enProceso.push(tarea); break;
-      case 3: this.finalizadas.push(tarea); break;
-      case 4: this.inconclusas.push(tarea); break;
-    }
-
-    this.reasignarLista(this.getListaIdPorEstado(estadoAnterior));
-    this.reasignarLista(this.getListaIdPorEstado(estadoNuevo));
-    this.cdr.detectChanges();
-  }
-
-  quitarTareaDeLista(tareaId: number, estado: number) {
-    let lista = this.getListaPorEstado(estado);
-    const index = lista.findIndex(t => t.id === tareaId);
-    if (index > -1) lista.splice(index, 1);
-  }
-
-  getListaPorEstado(estado: number) {
-    switch (estado) {
-      case 0: return this.pendientes;
-      case 1: return this.listas;
-      case 2: return this.enProceso;
-      case 3: return this.finalizadas;
-      case 4: return this.inconclusas;
-      default: return this.pendientes;
-    }
-  }
-
-  getListaIdPorEstado(estado: number): string {
-    switch (estado) {
-      case 0: return 'pendientes-list';
-      case 1: return 'listas-list';
-      case 2: return 'enproceso-list';
-      case 3: return 'finalizadas-list';
-      case 4: return 'inconclusas-list';
-      default: return 'pendientes-list';
-    }
-  }
-
+  // --- Métodos auxiliares ---
   getEstadoPorContenedor(contenedorId: string): number {
     switch (contenedorId) {
       case 'pendientes-list': return 0;
@@ -272,21 +132,11 @@ export class ProjectKanbanComponent implements OnInit {
 
   reasignarLista(listaId: string): void {
     switch (listaId) {
-      case 'pendientes-list':
-        this.pendientes = [...this.pendientes];
-        break;
-      case 'listas-list':
-        this.listas = [...this.listas];
-        break;
-      case 'enproceso-list':
-        this.enProceso = [...this.enProceso];
-        break;
-      case 'finalizadas-list':
-        this.finalizadas = [...this.finalizadas];
-        break;
-      case 'inconclusas-list':
-        this.inconclusas = [...this.inconclusas];
-        break;
+      case 'pendientes-list': this.pendientes = [...this.pendientes]; break;
+      case 'listas-list': this.listas = [...this.listas]; break;
+      case 'enproceso-list': this.enProceso = [...this.enProceso]; break;
+      case 'finalizadas-list': this.finalizadas = [...this.finalizadas]; break;
+      case 'inconclusas-list': this.inconclusas = [...this.inconclusas]; break;
     }
   }
 
@@ -294,47 +144,92 @@ export class ProjectKanbanComponent implements OnInit {
     return tarea.id;
   }
 
-  eliminarTarea(tarea: any, estado: number): void {
-    console.log('Eliminar tarea con id:', tarea.id);
-    if (!confirm('¿Seguro que deseas eliminar esta tarea?')) return;
+  public abrirDetalleTarea(tareaId: number): void {
+    this.projectService.obtenerDetalleTarea(tareaId).subscribe({
+      next: (detalle) => {
+        const tareaNormalizada = {
+          id: detalle.Id,
+          descripcion: detalle.Descripcion,
+          ubicacion: detalle.Ubicacion,
+          estado: this.getEstadoNombre(detalle.Estado),
+          proyectoId: detalle.ProyectoId,
+          fechaInicioEstimado: detalle.FechaInicioEstimado,
+          fechaFinEstimado: detalle.FechaFinEstimado,
+          comentarios: detalle.Comentarios || []
+        };
+        this.dialog.open(TaskDetailComponent, {
+          data: tareaNormalizada,
+          width: '900px',
+          maxWidth: '90vw'
+        });
+      },
+      error: (err) => console.error('Error al obtener detalle de tarea:', err)
+    });
+  }
 
+  public eliminarTarea(tarea: any, estado: number): void {
+    if (!confirm('¿Seguro que deseas eliminar esta tarea?')) return;
     this.projectService.eliminarTarea(tarea.id).subscribe({
       next: () => {
         this.quitarTareaDeLista(tarea.id, estado);
         this.reasignarLista(this.getListaIdPorEstado(estado));
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Error al eliminar tarea:', err);
+      error: (err) => console.error('Error al eliminar tarea:', err)
+    });
+  }
+
+  public abrirModalTarea(): void {
+    this.dialog.open(TaskModalComponent, { data: null, width: '400px' }).afterClosed().subscribe(result => {
+      if (result) {
+        const nuevaTarea = {
+          ProyectoId: this.projectId,
+          Descripcion: result.descripcion || '',
+          Ubicacion: result.ubicacion || null,
+          FechaInicioEstimado: result.fechaInicioEstimado || null,
+          FechaFinEstimado: result.fechaFinEstimado || null,
+          Prioridad: result.prioridad ?? 1,
+          AttachmentRequerido: result.attachmentRequerido || false,
+          UbicacionRequeridaAlCerrar: result.ubicacionRequeridaAlCerrar || false
+        };
+        this.projectService.crearTarea(nuevaTarea).subscribe({
+          next: (tareaCreada) => {
+            this.pendientes.push(tareaCreada);
+            this.reasignarLista('pendientes-list');
+            this.cdr.detectChanges();
+          },
+          error: (err) => console.error('Error al crear tarea:', err)
+        });
       }
     });
   }
 
-abrirDetalleTarea(tareaId: number): void {
-  this.projectService.obtenerDetalleTarea(tareaId).subscribe({
-    next: (detalle) => {
-      const tareaNormalizada = {
-        id: detalle.Id,
-        descripcion: detalle.Descripcion,
-        ubicacion: detalle.Ubicacion,
-      estado: this.getEstadoNombre(detalle.Estado),
-        proyectoId: detalle.ProyectoId,
-        fechaInicioEstimado: detalle.FechaInicioEstimado,
-        fechaFinEstimado: detalle.FechaFinEstimado,
-        comentarios: detalle.Comentarios || []
-      };
+  private quitarTareaDeLista(tareaId: number, estado: number) {
+    let lista = this.getListaPorEstado(estado);
+    const index = lista.findIndex(t => t.id === tareaId);
+    if (index > -1) lista.splice(index, 1);
+  }
 
-      this.dialog.open(TaskDetailComponent, {
-        data: tareaNormalizada,
-        width: '900px',
-        maxWidth: '90vw'
-      });
-    },
-    error: (err) => {
-      console.error('Error al obtener detalle de tarea:', err);
+  private getListaPorEstado(estado: number): any[] {
+    switch (estado) {
+      case 0: return this.pendientes;
+      case 1: return this.listas;
+      case 2: return this.enProceso;
+      case 3: return this.finalizadas;
+      case 4: return this.inconclusas;
+      default: return [];
     }
-  });
-}
+  }
+
+  private getListaIdPorEstado(estado: number): string {
+    switch (estado) {
+      case 0: return 'pendientes-list';
+      case 1: return 'listas-list';
+      case 2: return 'enproceso-list';
+      case 3: return 'finalizadas-list';
+      case 4: return 'inconclusas-list';
+      default: return 'pendientes-list';
+    }
+  }
 
 }
-

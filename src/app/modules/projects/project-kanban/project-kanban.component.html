@@ -1,4 +1,5 @@
 <div class="kanban-container">
+
   <!-- Pendientes -->
   <div class="kanban-column"
        cdkDropList
@@ -11,8 +12,9 @@
          *ngFor="let tarea of pendientes; trackBy: trackById" 
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
-      {{ tarea.descripcion }}
-      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 0); $event.stopPropagation()">
+      <span>{{ tarea.descripcion }}</span>
+      <button mat-icon-button color="warn" 
+              (click)="eliminarTarea(tarea, 0); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
@@ -30,8 +32,9 @@
          *ngFor="let tarea of listas; trackBy: trackById" 
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
-      {{ tarea.descripcion }}
-      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 1); $event.stopPropagation()">
+      <span>{{ tarea.descripcion }}</span>
+      <button mat-icon-button color="warn" 
+              (click)="eliminarTarea(tarea, 1); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
@@ -49,8 +52,9 @@
          *ngFor="let tarea of enProceso; trackBy: trackById" 
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
-      {{ tarea.descripcion }}
-      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 2); $event.stopPropagation()">
+      <span>{{ tarea.descripcion }}</span>
+      <button mat-icon-button color="warn" 
+              (click)="eliminarTarea(tarea, 2); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
@@ -68,8 +72,9 @@
          *ngFor="let tarea of finalizadas; trackBy: trackById" 
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
-      {{ tarea.descripcion }}
-      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 3); $event.stopPropagation()">
+      <span>{{ tarea.descripcion }}</span>
+      <button mat-icon-button color="warn" 
+              (click)="eliminarTarea(tarea, 3); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
@@ -87,15 +92,19 @@
          *ngFor="let tarea of inconclusas; trackBy: trackById" 
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
-      {{ tarea.descripcion }}
-      <button mat-icon-button color="warn" (click)="eliminarTarea(tarea, 4); $event.stopPropagation()">
+      <span>{{ tarea.descripcion }}</span>
+      <button mat-icon-button color="warn" 
+              (click)="eliminarTarea(tarea, 4); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
   </div>
+
 </div>
 
 <!-- FAB para nueva tarea -->
 <div class="bottom-actions">
-  <button mat-fab color="primary" (click)="abrirModalTarea()" aria-label="Nueva tarea">+</button>
+  <button mat-fab color="primary" (click)="abrirModalTarea()" aria-label="Nueva tarea">
+    <mat-icon>add</mat-icon>
+  </button>
 </div>
