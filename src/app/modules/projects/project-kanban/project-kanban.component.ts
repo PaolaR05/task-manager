@@ -45,7 +45,8 @@ export class ProjectKanbanComponent implements OnInit {
     this.cargarTareas();
   }
 
-  getEstadoNombre(estado: number): string {
+  // 🔹 Mapeo número -> nombre
+  public getEstadoNombre(estado: number): string {
     switch (estado) {
       case 0: return 'Pendiente';
       case 1: return 'Listas';
@@ -64,6 +65,7 @@ export class ProjectKanbanComponent implements OnInit {
           titulo: t.Titulo,
           descripcion: t.Descripcion,
           estado: t.Estado,
+          estadoNombre: this.getEstadoNombre(t.Estado), // 🔹 nombre del estado
           proyectoId: t.ProyectoId,
           ubicacion: t.Ubicacion,
           fechaInicioEstimado: t.FechaInicioEstimado,
@@ -82,28 +84,32 @@ export class ProjectKanbanComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<any[]>): void {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-      this.reasignarLista(event.container.id);
-    } else {
-      const tareaMovida = { ...event.previousContainer.data[event.previousIndex] };
-      const nuevoEstado = this.getEstadoPorContenedor(event.container.id);
+  if (event.previousContainer === event.container) {
+    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    this.reasignarLista(event.container.id);
+  } else {
+    const tareaMovida = { ...event.previousContainer.data[event.previousIndex] };
+    const nuevoEstado = this.getEstadoPorContenedor(event.container.id);
 
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
+    transferArrayItem(
+      event.previousContainer.data,
+      event.container.data,
+      event.previousIndex,
+      event.currentIndex
+    );
 
-      this.projectService.actualizarEstadoTarea(tareaMovida.id, nuevoEstado).subscribe({
+    // ✅ Aquí usamos el método correcto para actualizar solo el estado
+    this.projectService.actualizarEstadoTarea(tareaMovida.id, nuevoEstado)
+      .subscribe({
         next: () => {
+          // Actualizamos localmente la tarea
           tareaMovida.estado = nuevoEstado;
           this.reasignarLista(event.previousContainer.id);
           this.reasignarLista(event.container.id);
           this.cdr.detectChanges();
         },
         error: () => {
+          // Si falla, devolvemos la tarea a la lista anterior
           transferArrayItem(
             event.container.data,
             event.previousContainer.data,
@@ -115,10 +121,8 @@ export class ProjectKanbanComponent implements OnInit {
           this.cdr.detectChanges();
         }
       });
-    }
   }
-
-  // --- Métodos auxiliares ---
+}
   getEstadoPorContenedor(contenedorId: string): number {
     switch (contenedorId) {
       case 'pendientes-list': return 0;
@@ -151,7 +155,8 @@ export class ProjectKanbanComponent implements OnInit {
           id: detalle.Id,
           descripcion: detalle.Descripcion,
           ubicacion: detalle.Ubicacion,
-          estado: this.getEstadoNombre(detalle.Estado),
+          estado: detalle.Estado,
+          estadoNombre: this.getEstadoNombre(detalle.Estado), // 🔹 nombre del estado
           proyectoId: detalle.ProyectoId,
           fechaInicioEstimado: detalle.FechaInicioEstimado,
           fechaFinEstimado: detalle.FechaFinEstimado,
@@ -180,9 +185,13 @@ export class ProjectKanbanComponent implements OnInit {
   }
 
   public abrirModalTarea(): void {
-    this.dialog.open(TaskModalComponent, { data: null, width: '400px' }).afterClosed().subscribe(result => {
-      if (result) {
-        const nuevaTarea = {
+    this.dialog
+      .open(TaskModalComponent, { data: null, width: '400px' })
+      .afterClosed()
+      .subscribe(result => {
+        if (!result) return;
+
+        const nuevaTareaDto = {
           ProyectoId: this.projectId,
           Descripcion: result.descripcion || '',
           Ubicacion: result.ubicacion || null,
@@ -192,16 +201,31 @@ export class ProjectKanbanComponent implements OnInit {
           AttachmentRequerido: result.attachmentRequerido || false,
           UbicacionRequeridaAlCerrar: result.ubicacionRequeridaAlCerrar || false
         };
-        this.projectService.crearTarea(nuevaTarea).subscribe({
+
+        this.projectService.crearTarea(nuevaTareaDto).subscribe({
           next: (tareaCreada) => {
-            this.pendientes.push(tareaCreada);
+            const tareaNormalizada = {
+              id: tareaCreada.Id,
+              titulo: tareaCreada.Descripcion,
+              descripcion: tareaCreada.Descripcion,
+              estado: tareaCreada.Estado,
+              estadoNombre: this.getEstadoNombre(tareaCreada.Estado), // 🔹 nombre del estado
+              proyectoId: tareaCreada.ProyectoId,
+              ubicacion: tareaCreada.Ubicacion ?? null,
+              fechaInicioEstimado: tareaCreada.FechaInicioEstimado ?? null,
+              fechaFinEstimado: tareaCreada.FechaFinEstimado ?? null,
+              comentarios: tareaCreada.Comentarios ?? []
+            };
+
+            this.pendientes.push(tareaNormalizada);
             this.reasignarLista('pendientes-list');
             this.cdr.detectChanges();
           },
-          error: (err) => console.error('Error al crear tarea:', err)
+          error: (err) => {
+            console.error('Error al crear tarea:', err);
+          }
         });
-      }
-    });
+      });
   }
 
   private quitarTareaDeLista(tareaId: number, estado: number) {
@@ -231,5 +255,4 @@ export class ProjectKanbanComponent implements OnInit {
       default: return 'pendientes-list';
     }
   }
-
 }
