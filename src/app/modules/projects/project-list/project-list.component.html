@@ -1,27 +1,14 @@
-<div class="project-list-container">
-  <div class="header">
-    <h2>Proyectos</h2>
+<mat-card *ngFor="let project of projects" class="project-card">
+  <mat-card-title>{{ project.nombre }}</mat-card-title>
+  <mat-card-content>
+    <p><strong>Descripción:</strong> {{ project.descripcion }}</p>
+    <p><strong>Fechas:</strong> {{ project.fechaInicio | date }} - {{ project.fechaFin | date }}</p>
+    <p><strong>Avance:</strong> {{ project.porcentajeAvance | number:'1.0-0' }}%</p>
+    <mat-progress-bar [value]="project.porcentajeAvance" color="primary"></mat-progress-bar>
+  </mat-card-content>
 
-    <button mat-raised-button color="primary" [routerLink]="['/projects/form']" style="margin-bottom: 16px;">
-      + Nuevo Proyecto
-    </button>
-  </div>
-  
-  <div *ngIf="isLoading">Cargando proyectos...</div>
-
-  <div *ngIf="!isLoading && projects.length === 0">
-    No hay proyectos registrados.
-  </div>
-
-  <mat-card *ngFor="let project of projects" class="project-card">
-    <mat-card-title>{{ project.Nombre }}</mat-card-title>
-    <mat-card-content>
-      <p><strong>Descripción:</strong> {{ project.Descripcion || 'Sin descripción' }}</p>
-      <p><strong>Fechas:</strong> {{ project.FechaInicio | date }} - {{ project.FechaFin | date }}</p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-button color="accent" (click)="verKanban(project.Id)">Ver Kanban</button>
-      <button mat-button color="warn" (click)="eliminarProyecto(project.Id)">Eliminar</button>
-    </mat-card-actions>
-  </mat-card>
-</div>
+  <mat-card-actions>
+    <button mat-button color="accent" (click)="verKanban(project.id)">Ver Kanban</button>
+    <button mat-button color="warn" (click)="eliminarProyecto(project.id)">Eliminar</button>
+  </mat-card-actions>
+</mat-card>

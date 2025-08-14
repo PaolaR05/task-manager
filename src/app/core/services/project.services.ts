@@ -26,6 +26,15 @@ export interface CreateProyectoDto {
   fechaFin?: string;
 }
 
+export interface ProyectoConAvance {
+  Id: number;
+  Nombre: string;
+  Descripcion?: string;
+  FechaInicio?: string;
+  FechaFin?: string;
+  PorcentajeAvance: number;
+}
+
 export interface AsignarColaboradoresDto {
   proyectoId: number;
   usuarioIds: number[];
@@ -107,5 +116,10 @@ export class ProjectFormService {
       Authorization: `Bearer ${localStorage.getItem('token') || ''}`
     });
   }
+getProyectosConAvance(): Observable<ProyectoConAvance[]> {
+  return this.http.get<ProyectoConAvance[]>(`${this.baseUrl}/con-avance`, {
+    headers: this.getAuthHeaders()
+  });
+}
 
 }
