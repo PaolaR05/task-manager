@@ -31,7 +31,7 @@ export class MainComponent implements OnInit {
   ngOnInit() {
     
     this.user = this.auth.userSubject.value;
-    console.log('Usuario actual:', this.user); //revisar los datos del jsn
+    console.log('Usuario actual:', this.user); //confirmar que me esta tirando la info completa
     
     this.auth.user$.subscribe(u => {
       this.user = u;

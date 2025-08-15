@@ -1,18 +1,51 @@
 <div class="login-container">
-  <mat-card>
+  <mat-card class="login-card">
     <h2>Iniciar Sesión</h2>
-    <form (ngSubmit)="login()">
-      <mat-form-field appearance="fill">
+
+    <form #loginForm="ngForm" (ngSubmit)="login()">
+      <!-- Email -->
+      <mat-form-field appearance="fill" class="full-width">
         <mat-label>Email</mat-label>
-        <input matInput type="email" [(ngModel)]="email" name="email" required>
+        <input matInput 
+               type="email" 
+               [(ngModel)]="email" 
+               name="email" 
+               required
+               email
+               #emailField="ngModel">
+        <mat-error *ngIf="emailField.invalid && emailField.touched">
+          <span *ngIf="emailField.errors?.['required']">El email es obligatorio</span>
+          <span *ngIf="emailField.errors?.['email']">Email no válido</span>
+        </mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="fill">
+      <!-- Contraseña -->
+      <mat-form-field appearance="fill" class="full-width">
         <mat-label>Contraseña</mat-label>
-        <input matInput type="password" [(ngModel)]="password" name="password" required>
+        <input matInput 
+               [(ngModel)]="password" 
+               name="password" 
+               [type]="hidePassword ? 'password' : 'text'" 
+               required
+               minlength="6"
+               #passwordField="ngModel">
+        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="passwordField.invalid && passwordField.touched">
+          <span *ngIf="passwordField.errors?.['required']">La contraseña es obligatoria</span>
+          <span *ngIf="passwordField.errors?.['minlength']">Mínimo 6 caracteres</span>
+        </mat-error>
       </mat-form-field>
 
-      <button mat-raised-button color="primary" type="submit">Ingresar</button>
+      <!-- Botón de login -->
+      <button mat-raised-button 
+              color="primary" 
+              type="submit" 
+              class="full-width"
+              [disabled]="loginForm.invalid">
+        Ingresar
+      </button>
     </form>
   </mat-card>
 </div>

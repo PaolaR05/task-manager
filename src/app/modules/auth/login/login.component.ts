@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from "@angular/material/icon";
 
 @Component({
   selector: 'app-login',
@@ -19,12 +20,14 @@ import { MatButtonModule } from '@angular/material/button';
     MatInputModule,
     MatCardModule,
     MatButtonModule,
-    MatSnackBarModule
-  ]
+    MatSnackBarModule,
+    MatIconModule
+]
 })
 export class LoginComponent {
   email = '';
   password = '';
+  hidePassword: boolean = true; 
 
   constructor(private auth: AuthService, private router: Router, private snackBar: MatSnackBar) {}
 

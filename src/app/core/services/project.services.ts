@@ -82,7 +82,6 @@ export class ProjectFormService {
   }
 
   actualizarEstadoTarea(tareaId: number, nuevoEstado: number): Observable<any> {
-    // Enviar directamente el número del enum
     return this.http.patch(`${this.tareasUrl}/${tareaId}/estado`, nuevoEstado, { headers: this.getAuthHeaders() });
   }
 

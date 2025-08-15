@@ -1,5 +1,5 @@
+<!-- SECCIÓN SUPERIOR: Estadísticas -->
 <div class="stat-cards-container">
-  <!-- Total Proyectos: visible para todos -->
   <mat-card class="stat-card">
     <mat-card-header>
       <mat-card-title>Total Proyectos</mat-card-title>
@@ -9,7 +9,6 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Total Colaboradores: superadmin y admin_empresa -->
   <mat-card *ngIf="rolUsuario === 'superadmin' || rolUsuario === 'admin_empresa'" class="stat-card">
     <mat-card-header>
       <mat-card-title>Total Colaboradores</mat-card-title>
@@ -19,7 +18,6 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Total Empresas: solo superadmin -->
   <mat-card *ngIf="rolUsuario === 'superadmin'" class="stat-card">
     <mat-card-header>
       <mat-card-title>Total Empresas</mat-card-title>
@@ -29,7 +27,6 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Total Clientes: superadmin y admin_empresa -->
   <mat-card *ngIf="rolUsuario === 'superadmin' || rolUsuario === 'admin_empresa'" class="stat-card">
     <mat-card-header>
       <mat-card-title>Total Clientes</mat-card-title>
@@ -40,10 +37,40 @@
   </mat-card>
 </div>
 
-<!-- Spinner de carga -->
-<mat-progress-spinner *ngIf="loading" mode="indeterminate" aria-live="assertive"></mat-progress-spinner>
+<!-- SECCIÓN INFERIOR: Chart + Calendario -->
+<div class="dashboard-bottom-container">
+  
+  <!-- GRAFICA DE AVANCE -->
+  <mat-card class="dashboard-half">
+    <mat-card-header>
+      <mat-card-title>Avance de Proyectos</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="card-content">
+      <div *ngIf="proyectosConAvance.length === 0" class="empty-state">
+        <p>No hay proyectos para mostrar.</p>
+      </div>
+      <div *ngIf="proyectosConAvance.length > 0" class="chart-container">
+        <canvas baseChart
+                [data]="barChartData"
+                [options]="barChartOptions"
+                chartType="bar">
+        </canvas>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
-<!-- Calendario de FullCalendar -->
-<div class="full-calendar-container" *ngIf="!loading">
-  <full-calendar [options]="calendarOptions"></full-calendar>
+  <!-- CALENDARIO -->
+  <mat-card class="dashboard-half">
+    <mat-card-header>
+      <mat-card-title>Calendario de Tareas</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="card-content">
+      <mat-progress-spinner *ngIf="loading" mode="indeterminate" aria-live="assertive"></mat-progress-spinner>
+      <div *ngIf="!loading" class="calendar-container">
+        <full-calendar [options]="calendarOptions"></full-calendar>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>
+
+
