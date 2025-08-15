@@ -1,23 +1,43 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer mode="side" opened class="sidenav">
-<mat-nav-list>
-  <!-- Siempre visible -->
-  <a mat-list-item routerLink="/dashboard">Dashboard</a>
-  <a mat-list-item routerLink="/projects">Proyectos</a>
+  <mat-sidenav #drawer mode="side" opened class="sidenav blue-sidenav">
+     <!-- Logo -->
+  <div class="logo-container">
+    <img src="/logo.png" alt="Logo">
+  </div>
+    
+    <mat-nav-list>
+      <!-- Siempre visible -->
+      <a mat-list-item routerLink="/dashboard">
+        <mat-icon matListIcon>dashboard</mat-icon>
+        <span> Dashboard</span>
+      </a>
 
-  <!-- Solo para admin_empresa y superadmin -->
-  <a *ngIf="user?.rol === 'admin_empresa' || user?.rol === 'superadmin'" 
-     mat-list-item routerLink="/users">Usuarios</a>
+      <a mat-list-item routerLink="/projects">
+        <mat-icon matListIcon>work</mat-icon>
+        <span> Proyectos</span>
+      </a>
 
-  <!-- Solo para superadmin -->
-  <a *ngIf="user?.rol === 'superadmin'" 
-     mat-list-item routerLink="/companies">Empresas</a>
+      <!-- Solo para admin_empresa y superadmin -->
+      <a *ngIf="user?.rol === 'admin_empresa' || user?.rol === 'superadmin'" 
+         mat-list-item routerLink="/users">
+        <mat-icon matListIcon>group</mat-icon>
+        <span> Usuarios</span>
+      </a>
 
-  <!-- Solo para admin_empresa y superadmin -->
-  <a *ngIf="user?.rol === 'admin_empresa' || user?.rol === 'superadmin'" 
-     mat-list-item routerLink="/customers">Clientes</a>
-</mat-nav-list>
+      <!-- Solo para superadmin -->
+      <a *ngIf="user?.rol === 'superadmin'" 
+         mat-list-item routerLink="/companies">
+        <mat-icon matListIcon>business</mat-icon>
+        <span> Empresas</span>
+      </a>
 
+      <!-- Solo para admin_empresa y superadmin -->
+      <a *ngIf="user?.rol === 'admin_empresa' || user?.rol === 'superadmin'" 
+         mat-list-item routerLink="/customers">
+        <mat-icon matListIcon>people</mat-icon>
+        <span> Clientes</span>
+      </a>
+    </mat-nav-list>
   </mat-sidenav>
 
   <mat-sidenav-content>
@@ -25,7 +45,7 @@
       <button mat-icon-button (click)="drawer.toggle()">
         <mat-icon>menu</mat-icon>
       </button>
-      <span>Task Manager</span>
+      <span> Task Manager</span>
       <span class="spacer"></span>
 
       <span *ngIf="user" class="user-info">
