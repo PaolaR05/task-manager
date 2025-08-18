@@ -1,4 +1,5 @@
 <mat-horizontal-stepper [linear]="true" #stepper>
+
   <!-- Paso 1: Información general -->
   <mat-step [stepControl]="paso1Group" label="Información general">
     <form [formGroup]="paso1Group">
@@ -61,11 +62,10 @@
   <mat-step [stepControl]="paso3Group" label="Colaboradores">
     <form [formGroup]="paso3Group">
       <div *ngIf="colaboradores.length > 0">
-        <mat-selection-list>
+        <mat-selection-list (selectionChange)="onSeleccionColaboradores($event)">
           <mat-list-option
             *ngFor="let col of colaboradores"
-            [value]="col.id"
-            (selectionChange)="toggleColaborador(col.id, $event)"
+            [value]="col.Id"
           >
             {{ col.Name }} {{ col.Lastname }}
           </mat-list-option>
@@ -82,4 +82,5 @@
       </div>
     </form>
   </mat-step>
+
 </mat-horizontal-stepper>

@@ -37,6 +37,9 @@ export class TaskModalComponent {
     { value: 2, label: 'Alta' }
   ];
 
+  minFechaHoy = new Date();
+  minFechaFin: Date | null = null;
+
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<TaskModalComponent>,
@@ -50,7 +53,36 @@ export class TaskModalComponent {
       prioridad: [typeof data?.prioridad === 'number' ? data.prioridad : 1, Validators.required],
       attachmentRequerido: [data?.attachmentRequerido || false],
       ubicacionRequeridaAlCerrar: [data?.ubicacionRequeridaAlCerrar || false]
-    });
+    }, { validators: this.fechasValidator });
+
+    // Si ya hay una fecha de inicio, actualizamos minFechaFin para que la fecha fin no pueda ser menor
+    if (data?.fechaInicioEstimado) {
+      this.minFechaFin = new Date(data.fechaInicioEstimado);
+    }
+  }
+
+  fechasValidator(group: FormGroup) {
+    const inicio = group.get('fechaInicioEstimado')?.value;
+    const fin = group.get('fechaFinEstimado')?.value;
+
+    if (inicio && fin && fin < inicio) {
+      group.get('fechaFinEstimado')?.setErrors({ fechaFinAntesDeInicio: true });
+      return { fechaFinAntesDeInicio: true };
+    } else {
+      if (group.get('fechaFinEstimado')?.hasError('fechaFinAntesDeInicio')) {
+        group.get('fechaFinEstimado')?.setErrors(null);
+      }
+      return null;
+    }
+  }
+
+  onFechaInicioChange(fecha: Date) {
+    this.minFechaFin = fecha;
+
+    const fechaFin = this.tareaForm.get('fechaFinEstimado')?.value;
+    if (fechaFin && fechaFin < fecha) {
+      this.tareaForm.get('fechaFinEstimado')?.setValue(null);
+    }
   }
 
   guardar() {

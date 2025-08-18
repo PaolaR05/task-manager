@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProjectFormService } from '../../../core/services/project.services';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-project-form',
   templateUrl: './project-form.component.html',
-  styleUrls: ['./project-form.component.scss']
+  styleUrls: ['./project-form.component.scss'],
+
 })
 export class ProjectFormComponent implements OnInit {
   stepperForm: FormGroup;
@@ -67,6 +69,12 @@ export class ProjectFormComponent implements OnInit {
     }
     this.stepperForm.get('paso3.colaboradores')?.setValue(this.seleccionados);
   }
+onSeleccionColaboradores(event: any) {
+  const seleccionados = event.source.selectedOptions.selected.map((item: any) => item.value);
+  this.seleccionados = seleccionados;
+  this.stepperForm.get('paso3.colaboradores')?.setValue(seleccionados);
+}
+
 
   onFechaInicioChange(fechaInicio: Date | null): void {
     if (fechaInicio) {
@@ -99,7 +107,11 @@ export class ProjectFormComponent implements OnInit {
 
       this.projectService.crearProyecto(proyectoDto).subscribe((res: any) => {
         const proyectoId = res.id || res.Id;
-
+        console.log('Proyecto creado con ID:', proyectoId);
+          console.log('Asignando colaboradores:', {
+        proyectoId,
+        usuarioIds: paso3.colaboradores
+      });
         if (paso3.colaboradores.length > 0) {
           this.projectService.asignarColaboradores({
             proyectoId,

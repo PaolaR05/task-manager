@@ -5,6 +5,9 @@
   <mat-form-field appearance="fill" class="full-width">
     <mat-label>Descripción</mat-label>
     <textarea matInput formControlName="descripcion" rows="3"></textarea>
+    <mat-error *ngIf="tareaForm.get('descripcion')?.hasError('required')">
+      La descripción es obligatoria.
+    </mat-error>
   </mat-form-field>
 
   <mat-form-field appearance="fill" class="full-width">
@@ -14,16 +17,31 @@
 
   <mat-form-field appearance="fill">
     <mat-label>Fecha Inicio Estimado</mat-label>
-    <input matInput [matDatepicker]="inicioPicker" formControlName="fechaInicioEstimado" />
+    <input
+      matInput
+      [matDatepicker]="inicioPicker"
+      formControlName="fechaInicioEstimado"
+      [min]="minFechaHoy"
+      (dateChange)="onFechaInicioChange($event.value)"
+    />
     <mat-datepicker-toggle matSuffix [for]="inicioPicker"></mat-datepicker-toggle>
     <mat-datepicker #inicioPicker></mat-datepicker>
   </mat-form-field>
 
   <mat-form-field appearance="fill">
     <mat-label>Fecha Fin Estimado</mat-label>
-    <input matInput [matDatepicker]="finPicker" formControlName="fechaFinEstimado" />
+    <input
+      matInput
+      [matDatepicker]="finPicker"
+      formControlName="fechaFinEstimado"
+      [min]="minFechaFin || minFechaHoy"
+    />
     <mat-datepicker-toggle matSuffix [for]="finPicker"></mat-datepicker-toggle>
     <mat-datepicker #finPicker></mat-datepicker>
+
+    <mat-error *ngIf="tareaForm.get('fechaFinEstimado')?.hasError('fechaFinAntesDeInicio')">
+      La fecha fin no puede ser anterior a la fecha inicio.
+    </mat-error>
   </mat-form-field>
 
   <mat-form-field appearance="fill">

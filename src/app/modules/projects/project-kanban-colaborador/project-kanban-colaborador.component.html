@@ -1,0 +1,52 @@
+<div class="kanban-container">
+
+  <!-- Pendientes -->
+  <div class="kanban-column"
+       cdkDropList
+       id="pendientes-list"
+       [cdkDropListData]="proceso"
+       [cdkDropListConnectedTo]="connectedLists"
+       (cdkDropListDropped)="drop($event)">
+    <h3>Pendientes</h3>
+    <div class="kanban-card" 
+         *ngFor="let tarea of pendientes; trackBy: trackById" 
+         cdkDrag
+         (click)="abrirDetalleTarea(tarea.id)">
+      <span>{{ tarea.descripcion }}</span>
+    </div>
+  </div>
+
+  <!-- Finalizadas -->
+  <div class="kanban-column"
+       cdkDropList
+       id="finalizadas-list"
+       [cdkDropListData]="finalizadas"
+       [cdkDropListConnectedTo]="connectedLists"
+       (cdkDropListDropped)="drop($event)">
+    <h3>Finalizadas</h3>
+    <div class="kanban-card" 
+         *ngFor="let tarea of finalizadas; trackBy: trackById" 
+         cdkDrag
+         (click)="abrirDetalleTarea(tarea.id)">
+      <span>{{ tarea.descripcion }}</span>
+    </div>
+  </div>
+
+  <!-- Inconclusas -->
+  <div class="kanban-column"
+       cdkDropList
+       id="inconclusas-list"
+       [cdkDropListData]="inconclusas"
+       [cdkDropListConnectedTo]="connectedLists"
+       (cdkDropListDropped)="drop($event)">
+    <h3>Inconclusas</h3>
+    <div class="kanban-card" 
+         *ngFor="let tarea of inconclusas; trackBy: trackById" 
+         cdkDrag
+         (click)="abrirDetalleTarea(tarea.id)">
+      <span>{{ tarea.descripcion }}</span>
+    </div>
+  </div>
+
+</div>
+

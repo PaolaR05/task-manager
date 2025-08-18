@@ -12,7 +12,7 @@
         <span> Dashboard</span>
       </a>
 
-      <a mat-list-item routerLink="/projects">
+      <a *ngIf="user?.rol === 'admin_empresa' || user?.rol === 'superadmin'" mat-list-item routerLink="/projects">
         <mat-icon matListIcon>work</mat-icon>
         <span> Proyectos</span>
       </a>
@@ -37,6 +37,17 @@
         <mat-icon matListIcon>people</mat-icon>
         <span> Clientes</span>
       </a>
+
+      <a
+        *ngIf="user?.rol === 'colaborador'"
+        mat-list-item
+        routerLink="/projects/colaborador/lista"
+      >
+        <mat-icon matListIcon>list_alt</mat-icon>
+        <span> Mis Proyectos</span>
+      </a>
+
+
     </mat-nav-list>
   </mat-sidenav>
 

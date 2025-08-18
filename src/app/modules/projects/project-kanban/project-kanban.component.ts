@@ -98,7 +98,7 @@ export class ProjectKanbanComponent implements OnInit {
       event.currentIndex
     );
 
-    // ✅ Aquí usamos el método correcto para actualizar solo el estado
+    // actualizar solo el estado
     this.projectService.actualizarEstadoTarea(tareaMovida.id, nuevoEstado)
       .subscribe({
         next: () => {

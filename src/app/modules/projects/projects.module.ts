@@ -11,6 +11,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ProjectsRoutingModule } from './projects-routing.module'; // importar
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [ProjectFormComponent],
@@ -25,7 +26,8 @@ import { ProjectsRoutingModule } from './projects-routing.module'; // importar
     MatDatepickerModule,
     MatCheckboxModule,
     MatNativeDateModule,
-    ProjectsRoutingModule
+    ProjectsRoutingModule,
+    DragDropModule
   ]
 })
 export class ProjectsModule {}

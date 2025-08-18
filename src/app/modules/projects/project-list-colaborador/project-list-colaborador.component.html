@@ -1,0 +1,19 @@
+<div class="project-list-container">
+  <div class="header">
+    <!-- No mostrar botón de nuevo proyecto para colaborador -->
+  </div>
+
+  <div class="projects-grid">
+  <mat-card *ngFor="let project of projects" class="project-card">
+  <mat-card-title>{{ project.nombre }}</mat-card-title>
+  <mat-card-content>
+    <p><strong>Descripción:</strong> {{ project.descripcion }}</p>
+    <p><strong>Fechas:</strong> {{ project.fechaInicio | date }} - {{ project.fechaFin | date }}</p>
+    <p><strong>Tareas asignadas:</strong> {{ project.tareas?.length }}</p>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button color="accent" (click)="verKanban(project.id)">Ver Kanban</button>
+  </mat-card-actions>
+</mat-card>
+  </div>
+</div>

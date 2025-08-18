@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { UserService } from '../../../core/services/user.service';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../../core/services/auth.services';
 
 interface UserData {
   name: string;
@@ -51,18 +52,31 @@ export class UserFormComponent implements OnInit {
   roles = ['superadmin', 'admin_empresa', 'colaborador'];
   empresas: any[] = [];
 
+
+  esAdminEmpresa = false; 
   constructor(
     private route: ActivatedRoute,
     public router: Router,
     private userService: UserService,
-    private empresaService: EmpresaService
+    private empresaService: EmpresaService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    // Cargar empresas primero
+    const currentUser = this.authService.userSubject.value;
+
+    if (currentUser && currentUser.rol === 'admin_empresa') {
+      this.esAdminEmpresa = true;
+      this.userData.empresaId = currentUser.empresaId;
+    }
+
     this.empresaService.getEmpresas().subscribe(empresas => {
-      // Asegurarse que los IDs sean números
       this.empresas = empresas.map(e => ({ ...e, id: Number(e.Id) }));
+
+      // Si es admin_empresa → mostrar solo su empresa
+      if (this.esAdminEmpresa) {
+        this.empresas = this.empresas.filter(e => e.id === this.userData.empresaId);
+      }
 
       // Si es edición, cargar usuario
       this.route.params.subscribe(params => {
@@ -75,7 +89,7 @@ export class UserFormComponent implements OnInit {
               email: user.Email || '',
               password: '',
               rol: user.Rol || 'colaborador',
-              empresaId: user.EmpresaId != null ? Number(user.EmpresaId) : null
+              empresaId: user.EmpresaId != null ? Number(user.EmpresaId) : this.userData.empresaId
             };
           });
         }

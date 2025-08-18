@@ -40,6 +40,20 @@ export interface AsignarColaboradoresDto {
   usuarioIds: number[];
 }
 
+export interface TareaDetalle {
+  Id: number;
+  Descripcion: string;
+  
+}
+export interface ProyectoConTareas {
+  Id: number;
+  Nombre: string;
+  Descripcion?: string;
+  FechaInicio?: string;
+  FechaFin?: string;
+  Tareas: TareaDetalle[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -56,9 +70,13 @@ export class ProjectFormService {
     return this.http.post(this.baseUrl, dto, { headers: this.getAuthHeaders() });
   }
 
-  asignarColaboradores(dto: AsignarColaboradoresDto): Observable<any> {
-    return this.http.post(`${this.baseUrl}/asignar-colaboradores`, dto, { headers: this.getAuthHeaders() });
-  }
+asignarColaboradores(dto: AsignarColaboradoresDto): Observable<any> {
+  return this.http.post(`${this.baseUrl}/asignar-colaboradores`, dto, {
+    headers: this.getAuthHeaders(),
+    responseType: 'text' as const  // 👈 Aquí le dices que es texto plano
+  });
+}
+
 
   obtenerColaboradoresDisponibles(): Observable<any> {
     return this.http.get(`${this.usuariosUrl}/colaboradores`, { headers: this.getAuthHeaders() });
@@ -121,4 +139,12 @@ getProyectosConAvance(): Observable<ProyectoConAvance[]> {
   });
 }
 
+obtenerProyectosAsignados(): Observable<ProyectoConTareas[]> {
+  const url = `${this.baseUrl}/asignados`;
+  console.log('🌐 Llamando a:', url);
+
+  return this.http.get<ProyectoConTareas[]>(url, {
+    headers: this.getAuthHeaders()
+  });
+}
 }

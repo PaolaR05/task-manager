@@ -61,12 +61,16 @@
 
   <!-- Empresa -->
 <mat-form-field appearance="fill">
-  <mat-label>Empresa</mat-label>
-  <mat-select [(ngModel)]="userData.empresaId" name="empresaId" required #empresa="ngModel">
-    <mat-option *ngFor="let e of empresas" [value]="e.id">{{ e.Nombre || e.nombre }}</mat-option>
-  </mat-select>
-  <mat-error *ngIf="empresa.invalid && empresa.touched">Selecciona una empresa</mat-error>
-</mat-form-field>
+    <mat-label>Empresa</mat-label>
+    <mat-select [(ngModel)]="userData.empresaId" 
+                name="empresaId" 
+                required 
+                #empresa="ngModel"
+                [disabled]="userData.rol === 'admin_empresa'">
+      <mat-option *ngFor="let e of empresas" [value]="e.id">{{ e.Nombre || e.nombre }}</mat-option>
+    </mat-select>
+    <mat-error *ngIf="empresa.invalid && empresa.touched">Selecciona una empresa</mat-error>
+  </mat-form-field>
 
   <!-- Botones -->
   <div class="buttons">
