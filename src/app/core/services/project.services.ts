@@ -78,14 +78,32 @@ asignarColaboradores(dto: AsignarColaboradoresDto): Observable<any> {
 }
 
 
-  obtenerColaboradoresDisponibles(): Observable<any> {
-    return this.http.get(`${this.usuariosUrl}/colaboradores`, { headers: this.getAuthHeaders() });
-  }
+  obtenerColaboradoresDisponibles(projectId: number): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/${projectId}/colaboradores/disponibles`, {
+    headers: this.getAuthHeaders()
+  });
+}
+obtenerColaboradoresGenerales(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.usuariosUrl}/todos-colaboradores`, {
+    headers: this.getAuthHeaders()
+  });
+}
+
 
   obtenerProyectos(): Observable<any[]> {
     return this.http.get<any[]>(this.baseUrl, { headers: this.getAuthHeaders() });
   }
+  obtenerColaboradoresPorProyecto(proyectoId: number): Observable<any[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/${proyectoId}/colaboradores`, {
+    headers: this.getAuthHeaders()
+  });
+}
 
+eliminarColaborador(proyectoId: number, usuarioId: number): Observable<any> {
+  return this.http.delete(`${this.baseUrl}/${proyectoId}/colaboradores/${usuarioId}`, {
+    headers: this.getAuthHeaders()
+  });
+}
   eliminarProyecto(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`, { headers: this.getAuthHeaders() });
   }

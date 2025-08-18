@@ -55,11 +55,10 @@ export class ProjectFormComponent implements OnInit {
   }
 
   cargarColaboradores() {
-    this.projectService.obtenerColaboradoresDisponibles().subscribe(data => {
-      console.log('Colaboradores recibidos:', data);
-      this.colaboradores = data;
-    });
-  }
+  this.projectService.obtenerColaboradoresGenerales().subscribe(data => {
+    this.colaboradores = data;
+  });
+}
 
   toggleColaborador(id: number, event: any) {
     if (event.checked) {

@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';            // <-- Agregado
 import { ActivatedRoute } from '@angular/router';
 import { ProjectFormService } from '../../../core/services/project.services';
 import { MatDialog } from '@angular/material/dialog';
@@ -6,14 +7,14 @@ import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from 
 import { TaskDetailComponent } from '../task-details/task-details.component';
 
 @Component({
-  standalone:true,
+  standalone: true,
   selector: 'app-project-kanban-colaborador',
   templateUrl: './project-kanban-colaborador.component.html',
   styleUrls: ['./project-kanban-colaborador.component.scss'],
-imports: [
+  imports: [
+    CommonModule,            // <-- Agregar para *ngFor, *ngIf
     DragDropModule,
   ],
-
 })
 export class ProjectKanbanColaboradorComponent implements OnInit {
 
@@ -36,7 +37,7 @@ export class ProjectKanbanColaboradorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.projectId = +this.route.snapshot.paramMap.get('id')!;
+    this.projectId = Number(this.route.snapshot.paramMap.get('id'));
     this.cargarTareas();
   }
 
@@ -51,7 +52,7 @@ export class ProjectKanbanColaboradorComponent implements OnInit {
           comentarios: t.Comentarios || []
         }));
 
-        this.proceso= tareasNormalizadas.filter(t => t.estado === 2);
+        this.proceso = tareasNormalizadas.filter(t => t.estado === 2);
         this.finalizadas = tareasNormalizadas.filter(t => t.estado === 3);
         this.inconclusas = tareasNormalizadas.filter(t => t.estado === 4);
         this.cdr.detectChanges();
@@ -111,7 +112,6 @@ export class ProjectKanbanColaboradorComponent implements OnInit {
           estado: detalle.Estado,
           proyectoId: detalle.ProyectoId,
           comentarios: detalle.Comentarios || [],
-    
         };
 
         this.dialog.open(TaskDetailComponent, {

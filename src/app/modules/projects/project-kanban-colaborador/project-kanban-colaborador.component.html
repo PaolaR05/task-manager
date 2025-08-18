@@ -3,13 +3,13 @@
   <!-- Pendientes -->
   <div class="kanban-column"
        cdkDropList
-       id="pendientes-list"
+       id="proceso-list"
        [cdkDropListData]="proceso"
        [cdkDropListConnectedTo]="connectedLists"
        (cdkDropListDropped)="drop($event)">
     <h3>Pendientes</h3>
     <div class="kanban-card" 
-         *ngFor="let tarea of pendientes; trackBy: trackById" 
+         *ngFor="let tarea of proceso; trackBy: trackById" 
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
       <span>{{ tarea.descripcion }}</span>
@@ -49,4 +49,3 @@
   </div>
 
 </div>
-

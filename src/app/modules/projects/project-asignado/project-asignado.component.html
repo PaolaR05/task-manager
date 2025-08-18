@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Colaboradores del Proyecto</h2>
+
+<mat-dialog-content>
+  <h4>Asignados:</h4>
+  <mat-list *ngIf="asignados.length; else noAsignados">
+    <mat-list-item *ngFor="let col of asignados">
+      {{ col.Name }} {{ col.Lastname }} 
+      <button mat-icon-button  (click)="quitarColaborador(col.Id)" aria-label="Eliminar colaborador">
+        <mat-icon>close_small</mat-icon>
+      </button>
+    </mat-list-item>
+  </mat-list>
+  <ng-template #noAsignados>
+    <p>No hay colaboradores asignados.</p>
+  </ng-template>
+
+  <h4>Disponibles para agregar:</h4>
+  <mat-selection-list #lista>
+    <mat-list-option *ngFor="let col of disponibles" [value]="col.Id">
+      {{ col.Name }} {{ col.Lastname }}
+    </mat-list-option>
+  </mat-selection-list>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancelar()">Cerrar</button>
+  <button mat-button color="primary" (click)="agregar(lista.selectedOptions.selected)">Agregar</button>
+</mat-dialog-actions>

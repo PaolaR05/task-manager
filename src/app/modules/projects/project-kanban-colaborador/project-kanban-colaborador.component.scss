@@ -1,0 +1,66 @@
+.kanban-container {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  overflow-x: auto;
+  align-items: flex-start;
+}
+
+.kanban-column {
+  gap: 16px;
+  flex: 1;
+  background-color: white;
+  border-radius: 6px;
+  padding: 12px;
+  min-height: 400px;
+  max-height: 80vh; /* scroll interno seguro */
+  overflow-y: auto;
+}
+
+.kanban-card {
+  gap: 16px;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  margin-bottom: 12px;
+  cursor: grab;
+
+  /* NUEVO: Sombra y color de borde más visible */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #bbb;
+}
+
+/* Al pasar el mouse por encima */
+.kanban-card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  background-color: #ffffff;
+}
+
+/* Cuando está activa (en movimiento) */
+.kanban-card:active {
+  cursor: grabbing;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+
+.cdk-drag-preview {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  border-radius: 4px;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.bottom-actions {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 1000; /* sobre otros elementos */
+}
