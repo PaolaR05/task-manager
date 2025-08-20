@@ -42,4 +42,6 @@ obtenerProyectosConAvance(): Observable<ProyectoConAvanceDto[]> {
   return this.http.get<ProyectoConAvanceDto[]>(`/api/proyectos/con-avance`);
 }
 
+
+
 }

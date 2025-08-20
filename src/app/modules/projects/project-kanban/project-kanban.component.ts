@@ -149,13 +149,15 @@ export class ProjectKanbanComponent implements OnInit {
   abrirDetalleTarea(tareaId: number): void {
     this.projectService.obtenerDetalleTarea(tareaId).subscribe({
       next: (detalle) => {
+          console.log('Detalle tarea:', detalle);
+
         const tareaNormalizada = {
           id: detalle.Id,
           descripcion: detalle.Descripcion,
           ubicacion: detalle.Ubicacion,
           estado: detalle.Estado,
           estadoNombre: this.getEstadoNombre(detalle.Estado),
-          proyectoId: detalle.ProyectoId,
+          proyectoId: this.projectId,
           fechaInicioEstimado: detalle.FechaInicioEstimado,
           fechaFinEstimado: detalle.FechaFinEstimado,
           comentarios: detalle.Comentarios || []

@@ -1,51 +1,66 @@
-<h2 mat-dialog-title>Detalle de Tarea</h2>
-
 <mat-dialog-content class="task-detail-content">
-  <div class="container">
+  <div class="two-column-layout">
 
-    <!-- Sección de Información -->
-    <section class="info-section">
+    <!-- Columna Izquierda -->
+    <div class="info-section">
       <h3>Información</h3>
       <p><strong>Descripción:</strong> {{ tarea.descripcion }}</p>
       <p><strong>Ubicación:</strong> {{ tarea.ubicacion || 'No especificada' }}</p>
       <p><strong>Estado:</strong> {{ tarea.estadoNombre }}</p>
       <p><strong>Fecha Inicio Estimado:</strong> {{ tarea.fechaInicioEstimado | date:'mediumDate' }}</p>
       <p><strong>Fecha Fin Estimado:</strong> {{ tarea.fechaFinEstimado | date:'mediumDate' }}</p>
-    
-        <!-- Sección de Adjuntos -->
-    <section class="attachments-section">
-      <h3>Adjuntos</h3>
 
+      <h3>Adjuntos</h3>
       <input type="file" (change)="seleccionarArchivo($event)" />
       <button mat-flat-button color="primary" (click)="subirArchivo()" [disabled]="!archivoSeleccionado || loading">
         Subir Archivo
       </button>
 
-      <div class="adjuntos-list" *ngIf="tarea.adjuntos?.length > 0; else sinAdjuntos">
-        <div *ngFor="let a of tarea.adjuntos">
+      <div class="attachments" *ngIf="tarea.adjuntos?.length > 0; else sinAdjuntos">
+        <div class="attachment-item" *ngFor="let a of tarea.adjuntos">
           <a [href]="a.archivoUrl" target="_blank">{{ a.nombreArchivo }}</a>
           <small>{{ a.fechaSubida | date:'short' }}</small>
         </div>
       </div>
+
       <ng-template #sinAdjuntos>
         <p class="no-attachments">No hay adjuntos.</p>
       </ng-template>
-    </section>
-    
-    </section>
 
-    <!-- Sección de Comentarios -->
-    <section class="comments-section">
+      <div *ngIf="tarea.colaboradores?.length > 0">
+        <h4>Colaboradores actuales:</h4>
+        <ul>
+          <li *ngFor="let c of tarea.colaboradores">{{ c.name }} {{ c.lastname }}</li>
+        </ul>
+      </div>
+
+      <!-- Sección para asignar colaboradores -->
+      <h3>Asignar Colaboradores</h3>
+      <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Selecciona colaboradores</mat-label>
+        <mat-select multiple [(value)]="usuariosSeleccionados" [disabled]="loading">
+          <mat-option *ngFor="let usuario of usuariosDisponibles" [value]="usuario.id">
+            {{ usuario.Name }} {{ usuario.Lastname }} 
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="asignarColaboradores()" 
+        [disabled]="usuariosSeleccionados.length === 0 || loading">
+        Asignar colaboradores
+      </button>
+    </div>
+
+    <!-- Columna Derecha -->
+    <div class="comments-section">
       <h3>Comentarios</h3>
 
-      <div *ngIf="tarea.comentarios?.length > 0; else sinComentarios" class="comments-list">
-        <div *ngFor="let c of tarea.comentarios" class="comment-item">
-          <div class="comment-header">
+      <div class="chat-messages" *ngIf="tarea.comentarios?.length > 0; else sinComentarios">
+        <div *ngFor="let c of tarea.comentarios" class="message-bubble">
+          <div class="message-header">
             <strong>{{ c.UsuarioNombre }}</strong>
-            <small>{{ c.FechaComentario | date:'short' }}</small>
+            <span>{{ c.FechaComentario | date:'short' }}</span>
           </div>
-          <p>{{ c.ComentarioTexto }}</p>
-          <mat-divider></mat-divider>
+          <div class="message-text">{{ c.ComentarioTexto }}</div>
         </div>
       </div>
 
@@ -53,14 +68,13 @@
         <p class="no-comments">No hay comentarios.</p>
       </ng-template>
 
-      <!-- Nuevo Comentario -->
-      <section class="new-comment-section">
-        <mat-form-field appearance="outline" class="full-width">
+      <div class="chat-input-bar">
+        <mat-form-field appearance="outline" class="input-field">
           <mat-label>Nuevo Comentario</mat-label>
           <textarea matInput [(ngModel)]="nuevoComentario" rows="2" placeholder="Escribe un comentario..."></textarea>
         </mat-form-field>
-      </section>
-    </section>
+      </div>
+    </div>
 
   </div>
 
@@ -70,5 +84,7 @@
 <mat-dialog-actions align="end" class="dialog-actions">
   <button mat-stroked-button color="primary" (click)="editar()" [disabled]="loading">Editar</button>
   <button mat-stroked-button color="warn" (click)="cerrar()" [disabled]="loading">Cerrar</button>
-  <button mat-flat-button color="accent" (click)="enviarComentario()" [disabled]="!nuevoComentario || loading">Enviar Comentario</button>
+  <button mat-flat-button color="accent" (click)="enviarComentario()" [disabled]="!nuevoComentario || loading">
+    Enviar Comentario
+  </button>
 </mat-dialog-actions>
