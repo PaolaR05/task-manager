@@ -1,6 +1,6 @@
 <div class="kanban-container">
 
-  <!-- Pendientes -->
+  <!-- Pendientes / En Proceso -->
   <div class="kanban-column"
        cdkDropList
        id="proceso-list"
@@ -13,6 +13,7 @@
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
       <span>{{ tarea.descripcion }}</span>
+      <span class="prioridad">{{ getPrioridadTexto(tarea.prioridad) }}</span>
     </div>
   </div>
 
@@ -29,6 +30,7 @@
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
       <span>{{ tarea.descripcion }}</span>
+      <span class="prioridad">{{ getPrioridadTexto(tarea.prioridad) }}</span>
     </div>
   </div>
 
@@ -45,6 +47,7 @@
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
       <span>{{ tarea.descripcion }}</span>
+      <span class="prioridad">{{ getPrioridadTexto(tarea.prioridad) }}</span>
     </div>
   </div>
 

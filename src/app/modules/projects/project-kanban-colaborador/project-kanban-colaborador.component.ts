@@ -47,6 +47,7 @@ export class ProjectKanbanColaboradorComponent implements OnInit {
         const tareasNormalizadas = tareas.map(t => ({
           id: t.Id,
           descripcion: t.Descripcion,
+          prioridad: t.Prioridad ?? 1, // 👈 Asegúrate de que venga del backend
           estado: t.Estado,
           proyectoId: t.ProyectoId,
           comentarios: t.Comentarios || []
@@ -102,6 +103,14 @@ export class ProjectKanbanColaboradorComponent implements OnInit {
       default: return 0;
     }
   }
+getPrioridadTexto(prioridad: number): string {
+  switch (prioridad) {
+    case 1: return 'Alta';
+    case 2: return 'Media';
+    case 3: return 'Baja';
+    default: return 'Baja';
+  }
+}
 
   abrirDetalleTarea(tareaId: number): void {
     this.projectService.obtenerDetalleTarea(tareaId).subscribe({

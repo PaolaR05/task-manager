@@ -46,6 +46,27 @@ export class ProjectKanbanComponent implements OnInit {
     this.cargarTareas();
   }
 
+
+  getPrioridadTexto(prioridad: number): string {
+  switch (prioridad) {
+    case 3: return 'Alta';
+    case 2: return 'Media';
+    case 1: return 'Baja';
+    default: return 'Baja';
+  }
+}
+
+getPrioridadClase(prioridad: number): string {
+  switch (prioridad) {
+    case 3: return 'alta';
+    case 2: return 'media';
+    case 1: return 'baja';
+    default: return 'baja';
+  }
+}
+
+
+
   getEstadoNombre(estado: number): string {
     switch (estado) {
       case 0: return 'Pendiente';

@@ -13,6 +13,9 @@
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
       <span>{{ tarea.descripcion }}</span>
+      <span class="prioridad" [ngClass]="getPrioridadClase(tarea.prioridad)">
+        {{ getPrioridadTexto(tarea.prioridad) }}
+      </span>
       <button mat-icon-button color="warn" 
               (click)="eliminarTarea(tarea, 0); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
@@ -33,6 +36,9 @@
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
       <span>{{ tarea.descripcion }}</span>
+      <span class="prioridad" [ngClass]="getPrioridadClase(tarea.prioridad)">
+        {{ getPrioridadTexto(tarea.prioridad) }}
+      </span>
       <button mat-icon-button color="warn" 
               (click)="eliminarTarea(tarea, 1); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
@@ -53,6 +59,9 @@
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
       <span>{{ tarea.descripcion }}</span>
+      <span class="prioridad" [ngClass]="getPrioridadClase(tarea.prioridad)">
+        {{ getPrioridadTexto(tarea.prioridad) }}
+      </span>
       <button mat-icon-button color="warn" 
               (click)="eliminarTarea(tarea, 2); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
@@ -73,6 +82,9 @@
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
       <span>{{ tarea.descripcion }}</span>
+      <span class="prioridad" [ngClass]="getPrioridadClase(tarea.prioridad)">
+        {{ getPrioridadTexto(tarea.prioridad) }}
+      </span>
       <button mat-icon-button color="warn" 
               (click)="eliminarTarea(tarea, 3); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
@@ -93,6 +105,9 @@
          cdkDrag
          (click)="abrirDetalleTarea(tarea.id)">
       <span>{{ tarea.descripcion }}</span>
+      <span class="prioridad" [ngClass]="getPrioridadClase(tarea.prioridad)">
+        {{ getPrioridadTexto(tarea.prioridad) }}
+      </span>
       <button mat-icon-button color="warn" 
               (click)="eliminarTarea(tarea, 4); $event.stopPropagation()">
         <mat-icon>delete</mat-icon>
@@ -106,9 +121,8 @@
 <div class="bottom-actions">
   <button mat-fab color="primary" (click)="abrirModalTarea()" aria-label="Nueva tarea">
     <mat-icon>add</mat-icon>
-</button>
-<button mat-fab color="accent" (click)="abrirAsignadosModal()" aria-label="Colaboradores" style="margin-left: 12px;">
-  <mat-icon>group</mat-icon>
-</button>
-  
+  </button>
+  <button mat-fab color="accent" (click)="abrirAsignadosModal()" aria-label="Colaboradores" style="margin-left: 12px;">
+    <mat-icon>group</mat-icon>
+  </button>
 </div>
