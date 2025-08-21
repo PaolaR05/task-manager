@@ -46,74 +46,94 @@ export class TaskDetailComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private dialogRef: MatDialogRef<TaskDetailComponent>,
     private tareaService: ProjectFormService,
-    private usuarioService: UserService, 
+    private usuarioService: UserService,
     private dialog: MatDialog,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
- ngOnInit(): void {
+  ngOnInit(): void {
+    console.log('📦 DATA ENVIADA AL MODAL:', this.data);
 
-  console.log('📦 DATA ENVIADA AL MODAL:', this.data);
+    this.tarea = {
+      ...this.data,
+      proyectoId: this.data?.proyectoId ?? this.data?.ProyectoId ?? null
+    };
 
-  this.tarea = {
-    ...this.data,
-    proyectoId: this.data?.proyectoId ?? this.data?.ProyectoId ?? null
-  };
+    this.usuarioAutenticado = this.authService.isLoggedIn();
 
-  this.usuarioAutenticado = this.authService.isLoggedIn();
+    if (!this.tarea.comentarios) this.tarea.comentarios = [];
+    if (!this.tarea.adjuntos) this.tarea.adjuntos = [];
 
-  if (!this.tarea.comentarios) this.tarea.comentarios = [];
-  if (!this.tarea.adjuntos) this.tarea.adjuntos = [];
+    // Si estado ya viene como texto, lo dejamos; si es número, convertimos
+    if (typeof this.tarea.estado === 'number') {
+      this.tarea.estadoNombre = this.getEstadoNombre(this.tarea.estado);
+    }
 
-  this.tarea.estadoNombre = this.getEstadoNombre(this.tarea.estado);
+    if (this.tarea.prioridad != null) {
+      this.tarea.prioridadTexto = this.getPrioridadTexto(this.tarea.prioridad);
+    }
 
-  if (this.tarea.proyectoId) {
-    this.cargarUsuariosAsignados();
-    
-  } else {
-    console.warn('⚠️ No hay proyecto asociado a esta tarea');
-  }
-}
-
-
-cargarUsuariosAsignados() {
-  const proyectoId = this.tarea.proyectoId ?? this.data.proyectoId ?? null;
-  
-  if (!proyectoId) {
-    console.warn('No hay proyecto asociado a esta tarea');
-    return;
+    if (this.tarea.proyectoId) {
+      this.cargarUsuariosAsignados();
+    } else {
+      console.warn('⚠️ No hay proyecto asociado a esta tarea');
+    }
   }
 
-  this.tareaService.obtenerColaboradoresPorProyecto(proyectoId).subscribe({
-    next: (usuarios) => {
-      this.usuariosDisponibles = usuarios;
-            console.log('👥 Usuarios disponibles cargados:', this.usuariosDisponibles);  // <-- Aquí el console.log
+  getPrioridadTexto(prioridad: number): 'Alta' | 'Media' | 'Baja' {
+    switch (prioridad) {
+      case 1: return 'Alta';
+      case 2: return 'Media';
+      case 3: return 'Baja';
+      default: return 'Baja';
+    }
+  }
 
+  cargarUsuariosAsignados() {
+    const proyectoId = this.tarea.proyectoId ?? this.data.proyectoId ?? null;
+    if (!proyectoId) return;
+
+    this.tareaService.obtenerColaboradoresPorProyecto(proyectoId).subscribe({
+      next: (usuarios) => {
+        this.usuariosDisponibles = usuarios;
+        console.log('👥 Usuarios disponibles cargados:', this.usuariosDisponibles);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error al cargar colaboradores asignados:', err);
+      }
+    });
+  }
+
+ asignarColaboradores() {
+  if (!this.usuariosSeleccionados.length || !this.tarea?.id) return;
+
+  this.loading = true;
+
+  // Convertir a número por seguridad
+  const ids = this.usuariosSeleccionados.map(Number);
+
+  // Envolver en "dto" para cumplir con lo que el backend espera
+  const payload = { dto: { usuarioIds: ids } };
+
+  console.log('🚀 Payload que se enviará al backend:', payload);
+
+  this.tareaService.asignarColaboradoresATarea(this.tarea.id, payload).subscribe({
+    next: () => {
+      console.log('Usuarios asignados correctamente');
+      this.loading = false;
+      this.usuariosSeleccionados = [];
       this.cdr.detectChanges();
     },
     error: (err) => {
-      console.error('Error al cargar colaboradores asignados:', err);
+      console.error('Error al asignar colaboradores:', err);
+      this.loading = false;
     }
   });
 }
 
-  asignarColaboradores() {
-    if (!this.usuariosSeleccionados.length || !this.tarea?.id) return;
 
-    this.loading = true;
-    this.tareaService.asignarColaboradoresATarea(this.tarea.id, this.usuariosSeleccionados).subscribe({
-      next: () => {
-        this.loading = false;
-        this.usuariosSeleccionados = [];
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error al asignar colaboradores:', err);
-        this.loading = false;
-      }
-    });
-  }
 
   cerrar() {
     this.dialogRef.close(this.tarea);
@@ -156,7 +176,15 @@ cargarUsuariosAsignados() {
       this.tareaService.actualizarTarea(this.tarea.id, this.tarea).subscribe({
         next: (tareaActualizada) => {
           this.tarea = tareaActualizada;
-          this.tarea.estadoNombre = this.getEstadoNombre(this.tarea.estado);
+
+          if (typeof this.tarea.estado === 'number') {
+            this.tarea.estadoNombre = this.getEstadoNombre(this.tarea.estado);
+          }
+
+          if (this.tarea.prioridad != null) {
+            this.tarea.prioridadTexto = this.getPrioridadTexto(this.tarea.prioridad);
+          }
+
           this.loading = false;
           this.dialogRef.close(tareaActualizada);
           this.cdr.detectChanges();
@@ -194,7 +222,9 @@ cargarUsuariosAsignados() {
     });
   }
 
-  getEstadoNombre(estado: number): string {
+  getEstadoNombre(estado: number | string): string {
+    if (typeof estado === 'string') return estado;
+
     switch (estado) {
       case 0: return 'Pendiente';
       case 1: return 'Listas';

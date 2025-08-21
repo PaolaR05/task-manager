@@ -38,7 +38,7 @@
       <h3>Asignar Colaboradores</h3>
       <mat-form-field appearance="fill" style="width: 100%;">
         <mat-label>Selecciona colaboradores</mat-label>
-        <mat-select multiple [(value)]="usuariosSeleccionados" [disabled]="loading">
+        <mat-select multiple [(ngModel)]="usuariosSeleccionados" [disabled]="loading" name="usuarios">
           <mat-option *ngFor="let usuario of usuariosDisponibles" [value]="usuario.id">
             {{ usuario.Name }} {{ usuario.Lastname }} 
           </mat-option>

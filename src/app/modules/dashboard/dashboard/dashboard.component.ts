@@ -22,7 +22,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
   imports: [
     CommonModule, 
     MatCard, MatCardHeader, MatCardTitle, MatCardContent, 
-    MatListItem, MatList, MatProgressSpinner, FullCalendarModule,
+     MatProgressSpinner, FullCalendarModule,
     NgChartsModule
   ],
 })

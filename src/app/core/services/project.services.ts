@@ -77,11 +77,18 @@ asignarColaboradores(dto: AsignarColaboradoresDto): Observable<any> {
   });
 }
 
-asignarColaboradoresATarea(tareaId: number, usuarioIds: number[]): Observable<void> {
-  return this.http.post<void>(`/api/tareas/${tareaId}/asignar`, usuarioIds, {
-    headers: this.getAuthHeaders()
-  });
+asignarColaboradoresATarea(tareaId: number, payload: { dto: { usuarioIds: number[] } }): Observable<void> {
+  return this.http.post<void>(
+    `http://localhost:5167/api/tareas/${tareaId}/asignar`,
+    payload,
+    { headers: this.getAuthHeaders() }
+  );
 }
+
+
+
+
+
 obtenerColaboradoresPorTarea(tareaId: number): Observable<any[]> {
   return this.http.get<any[]>(`/api/tareas/${tareaId}/colaboradores`, {
     headers: this.getAuthHeaders()
