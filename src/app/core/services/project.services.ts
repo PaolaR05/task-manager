@@ -102,11 +102,11 @@ obtenerColaboradoresPorTarea(tareaId: number): Observable<any[]> {
     headers: this.getAuthHeaders()
   });
 }
-obtenerColaboradoresGenerales(): Observable<any[]> {
-  return this.http.get<any[]>(`${this.usuariosUrl}/todos-colaboradores`, {
-    headers: this.getAuthHeaders()
-  });
-}
+//obtenerColaboradoresGenerales(): Observable<any[]> {
+ // return this.http.get<any[]>(`${this.usuariosUrl}/todos-colaboradores`, {
+   // headers: this.getAuthHeaders()
+  //});
+//}
 
 
   obtenerProyectos(): Observable<any[]> {

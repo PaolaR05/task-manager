@@ -1,27 +1,43 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+
+// Material modules usados en el template
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';  // Para que funcione el datepicker con fechas nativas
+import { MatButtonModule } from '@angular/material/button';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatIconModule } from '@angular/material/icon';  // Opcional, si usas íconos
+
 import { ProjectFormService } from '../../../core/services/project.services';
-import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-project-form',
+  standalone: true,
+  selector: 'app-project-form-dialog',
   templateUrl: './project-form.component.html',
   styleUrls: ['./project-form.component.scss'],
-
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatButtonModule,
+    MatStepperModule,
+    MatIconModule
+  ]
 })
-export class ProjectFormComponent implements OnInit {
+export class ProjectFormDialogComponent {
   stepperForm: FormGroup;
-  colaboradores: any[] = [];
-  seleccionados: number[] = [];
-
-  minFechaInicio: Date = new Date();
-  minFechaFin: Date | null = null;
 
   constructor(
     private fb: FormBuilder,
     private projectService: ProjectFormService,
-    private router: Router
+    private router: Router,
+    private dialogRef: MatDialogRef<ProjectFormDialogComponent>
   ) {
     this.stepperForm = this.fb.group({
       paso1: this.fb.group({
@@ -31,71 +47,22 @@ export class ProjectFormComponent implements OnInit {
       paso2: this.fb.group({
         fechaInicio: ['', Validators.required],
         fechaFin: ['', Validators.required]
-      }),
-      paso3: this.fb.group({
-        colaboradores: [[]]
       })
     });
   }
 
-  ngOnInit(): void {
-    this.cargarColaboradores();
-  }
-
-  get paso1Group(): FormGroup {
+  get paso1Group() {
     return this.stepperForm.get('paso1') as FormGroup;
   }
 
-  get paso2Group(): FormGroup {
+  get paso2Group() {
     return this.stepperForm.get('paso2') as FormGroup;
-  }
-
-  get paso3Group(): FormGroup {
-    return this.stepperForm.get('paso3') as FormGroup;
-  }
-
-  cargarColaboradores() {
-  this.projectService.obtenerColaboradoresGenerales().subscribe(data => {
-    this.colaboradores = data;
-  });
-}
-
-  toggleColaborador(id: number, event: any) {
-    if (event.checked) {
-      this.seleccionados.push(id);
-    } else {
-      this.seleccionados = this.seleccionados.filter(x => x !== id);
-    }
-    this.stepperForm.get('paso3.colaboradores')?.setValue(this.seleccionados);
-  }
-onSeleccionColaboradores(event: any) {
-  const seleccionados = event.source.selectedOptions.selected.map((item: any) => item.value);
-  this.seleccionados = seleccionados;
-  this.stepperForm.get('paso3.colaboradores')?.setValue(seleccionados);
-}
-
-
-  onFechaInicioChange(fechaInicio: Date | null): void {
-    if (fechaInicio) {
-      this.minFechaFin = fechaInicio;
-
-      const fechaFinControl = this.paso2Group.get('fechaFin');
-      const fechaFin = fechaFinControl?.value;
-
-      // Si fechaFin es anterior a fechaInicio, la reseteamos
-      if (fechaFin && new Date(fechaFin) < fechaInicio) {
-        fechaFinControl?.setValue(null);
-      }
-    } else {
-      this.minFechaFin = null;
-    }
   }
 
   crearProyecto() {
     if (this.stepperForm.valid) {
       const paso1 = this.paso1Group.value;
       const paso2 = this.paso2Group.value;
-      const paso3 = this.paso3Group.value;
 
       const proyectoDto = {
         nombre: paso1.nombre,
@@ -104,28 +71,18 @@ onSeleccionColaboradores(event: any) {
         fechaFin: paso2.fechaFin
       };
 
-      this.projectService.crearProyecto(proyectoDto).subscribe((res: any) => {
-        const proyectoId = res.id || res.Id;
-        console.log('Proyecto creado con ID:', proyectoId);
-          console.log('Asignando colaboradores:', {
-        proyectoId,
-        usuarioIds: paso3.colaboradores
-      });
-        if (paso3.colaboradores.length > 0) {
-          this.projectService.asignarColaboradores({
-            proyectoId,
-            usuarioIds: paso3.colaboradores
-          }).subscribe(() => {
-            this.router.navigate(['/projects', proyectoId, 'kanban']);
-          });
-        } else {
+      this.projectService.crearProyecto(proyectoDto).subscribe({
+        next: (res: any) => {
+          const proyectoId = res.id || res.Id;
+          this.dialogRef.close(proyectoId);
           this.router.navigate(['/projects', proyectoId, 'kanban']);
-        }
+        },
+        error: (err) => console.error('Error creando proyecto:', err)
       });
     }
   }
 
-  cancelar(): void {
-    this.router.navigate(['/projects']);
+  cancelar() {
+    this.dialogRef.close();
   }
 }
