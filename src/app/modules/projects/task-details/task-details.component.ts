@@ -81,14 +81,15 @@ export class TaskDetailComponent implements OnInit {
     }
   }
 
-  getPrioridadTexto(prioridad: number): 'Alta' | 'Media' | 'Baja' {
-    switch (prioridad) {
-      case 1: return 'Alta';
-      case 2: return 'Media';
-      case 3: return 'Baja';
-      default: return 'Baja';
-    }
+ getPrioridadTexto(prioridad: number): 'Alta' | 'Media' | 'Baja' {
+  switch (prioridad) {
+    case 0: return 'Baja';
+    case 1: return 'Media';
+    case 2: return 'Alta';
+    default: return 'Baja';
   }
+}
+
 
   cargarUsuariosAsignados() {
     const proyectoId = this.tarea.proyectoId ?? this.data.proyectoId ?? null;
@@ -162,40 +163,53 @@ export class TaskDetailComponent implements OnInit {
   }
 
   editar() {
-    if (!this.usuarioAutenticado) return;
+  if (!this.usuarioAutenticado) return;
 
-    this.dialog.open(TaskModalComponent, {
-      data: this.tarea,
-      width: '1000px',
-    }).afterClosed().subscribe((actualizada) => {
-      if (!actualizada) return;
+  this.dialog.open(TaskModalComponent, {
+    data: this.tarea,
+    width: '1200px',
+  }).afterClosed().subscribe((actualizada) => {
+  if (!actualizada) return;
 
-      Object.assign(this.tarea, actualizada);
-      this.loading = true;
+  console.log('Datos recibidos del modal:', actualizada); // <--- Aquí
 
-      this.tareaService.actualizarTarea(this.tarea.id, this.tarea).subscribe({
-        next: (tareaActualizada) => {
-          this.tarea = tareaActualizada;
+  const tareaActualizada = {
+    ...this.tarea,
+    ...actualizada
+  };
 
-          if (typeof this.tarea.estado === 'number') {
-            this.tarea.estadoNombre = this.getEstadoNombre(this.tarea.estado);
-          }
+    this.loading = true;
 
-          if (this.tarea.prioridad != null) {
-            this.tarea.prioridadTexto = this.getPrioridadTexto(this.tarea.prioridad);
-          }
+    this.tareaService.actualizarTarea(this.tarea.id, tareaActualizada).subscribe({
+      next: (res) => {
+          console.log('Respuesta actualización:', res);
 
-          this.loading = false;
-          this.dialogRef.close(tareaActualizada);
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Error al actualizar la tarea:', err);
-          this.loading = false;
+        this.tarea = res;
+
+        if (typeof this.tarea.estado === 'number') {
+          this.tarea.estadoNombre = this.getEstadoNombre(this.tarea.estado);
         }
-      });
+
+        if (this.tarea.prioridad != null) {
+          this.tarea.prioridadTexto = this.getPrioridadTexto(this.tarea.prioridad);
+        }
+
+        this.loading = false;
+
+
+this.dialogRef.close(this.tarea);
+        console.log('Tarea actualizada:', this.tarea);
+
+      this.cdr.detectChanges();
+      },
+      error: (err) => {
+
+        console.error('Error al actualizar la tarea:', err);
+        this.loading = false;
+      }
     });
-  }
+  });
+}
 
   seleccionarArchivo(event: any) {
     this.archivoSeleccionado = event.target.files[0] ?? null;

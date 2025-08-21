@@ -50,7 +50,7 @@ export class TaskModalComponent {
       ubicacion: [data?.ubicacion || ''],
       fechaInicioEstimado: [data?.fechaInicioEstimado ? new Date(data.fechaInicioEstimado) : null],
       fechaFinEstimado: [data?.fechaFinEstimado ? new Date(data.fechaFinEstimado) : null],
-      prioridad: [typeof data?.prioridad === 'number' ? data.prioridad : 1, Validators.required],
+      prioridad: [data?.prioridad ?? '', Validators.required],
       attachmentRequerido: [data?.attachmentRequerido || false],
       ubicacionRequeridaAlCerrar: [data?.ubicacionRequeridaAlCerrar || false]
     }, { validators: this.fechasValidator });
@@ -69,8 +69,14 @@ export class TaskModalComponent {
       group.get('fechaFinEstimado')?.setErrors({ fechaFinAntesDeInicio: true });
       return { fechaFinAntesDeInicio: true };
     } else {
-      if (group.get('fechaFinEstimado')?.hasError('fechaFinAntesDeInicio')) {
-        group.get('fechaFinEstimado')?.setErrors(null);
+      const errors = group.get('fechaFinEstimado')?.errors;
+      if (errors) {
+        delete errors['fechaFinAntesDeInicio'];
+        if (Object.keys(errors).length === 0) {
+          group.get('fechaFinEstimado')?.setErrors(null);
+        } else {
+          group.get('fechaFinEstimado')?.setErrors(errors);
+        }
       }
       return null;
     }

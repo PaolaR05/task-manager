@@ -49,18 +49,18 @@ export class ProjectKanbanComponent implements OnInit {
 
   getPrioridadTexto(prioridad: number): string {
   switch (prioridad) {
-    case 3: return 'Alta';
-    case 2: return 'Media';
-    case 1: return 'Baja';
+    case 2: return 'Alta';
+    case 1: return 'Media';
+    case 0: return 'Baja';
     default: return 'Baja';
   }
 }
 
 getPrioridadClase(prioridad: number): string {
   switch (prioridad) {
-    case 3: return 'alta';
-    case 2: return 'media';
-    case 1: return 'baja';
+    case 2: return 'alta';
+    case 1: return 'media';
+    case 0: return 'baja';
     default: return 'baja';
   }
 }
@@ -88,6 +88,7 @@ getPrioridadClase(prioridad: number): string {
           estado: t.Estado,
           estadoNombre: this.getEstadoNombre(t.Estado),
           proyectoId: t.ProyectoId,
+          prioridad: t.Prioridad,
           ubicacion: t.Ubicacion,
           fechaInicioEstimado: t.FechaInicioEstimado,
           fechaFinEstimado: t.FechaFinEstimado,
@@ -167,31 +168,53 @@ getPrioridadClase(prioridad: number): string {
     return tarea.id;
   }
 
-  abrirDetalleTarea(tareaId: number): void {
-    this.projectService.obtenerDetalleTarea(tareaId).subscribe({
-      next: (detalle) => {
-          console.log('Detalle tarea:', detalle);
+abrirDetalleTarea(tareaId: number): void {
+  this.projectService.obtenerDetalleTarea(tareaId).subscribe({
+    next: (detalle) => {
+      const tareaNormalizada = {
+        id: detalle.Id,
+        descripcion: detalle.Descripcion,
+        prioridad: detalle.Prioridad, // 👈 importante
+        estado: detalle.Estado,
+        estadoNombre: this.getEstadoNombre(detalle.Estado),
+        proyectoId: this.projectId,
+        ubicacion: detalle.Ubicacion,
+        fechaInicioEstimado: detalle.FechaInicioEstimado,
+        fechaFinEstimado: detalle.FechaFinEstimado,
+        comentarios: detalle.Comentarios || []
+      };
 
-        const tareaNormalizada = {
-          id: detalle.Id,
-          descripcion: detalle.Descripcion,
-          ubicacion: detalle.Ubicacion,
-          estado: detalle.Estado,
-          estadoNombre: this.getEstadoNombre(detalle.Estado),
-          proyectoId: this.projectId,
-          fechaInicioEstimado: detalle.FechaInicioEstimado,
-          fechaFinEstimado: detalle.FechaFinEstimado,
-          comentarios: detalle.Comentarios || []
-        };
-        this.dialog.open(TaskDetailComponent, {
-          data: tareaNormalizada,
-          width: '900px',
-          maxWidth: '90vw'
-        });
-      },
-      error: (err) => console.error('Error al obtener detalle de tarea:', err)
-    });
-  }
+      const dialogRef = this.dialog.open(TaskDetailComponent, {
+        data: tareaNormalizada,
+        width: '900px',
+        maxWidth: '90vw'
+      });
+
+      // 🎯 Manejar el resultado del modal (tarea editada)
+      dialogRef.afterClosed().subscribe((tareaActualizada) => {
+        if (!tareaActualizada) return;
+
+        // Actualizar la lista correspondiente
+        const lista = this.getListaPorEstado(tareaActualizada.estado);
+        const index = lista.findIndex(t => t.id === tareaActualizada.id);
+
+        if (index > -1) {
+          lista[index] = {
+  ...lista[index],
+  ...tareaActualizada,
+  estadoNombre: this.getEstadoNombre(tareaActualizada.estado),
+  prioridadTexto: this.getPrioridadTexto(tareaActualizada.prioridad),
+  prioridadClase: this.getPrioridadClase(tareaActualizada.prioridad)
+};
+          this.reasignarLista(this.getListaIdPorEstado(tareaActualizada.estado));
+          this.cdr.detectChanges();
+        }
+      });
+    },
+    error: (err) => console.error('Error al obtener detalle de tarea:', err)
+  });
+}
+
 
   eliminarTarea(tarea: any, estado: number): void {
     if (!confirm('¿Seguro que deseas eliminar esta tarea?')) return;
@@ -218,7 +241,7 @@ getPrioridadClase(prioridad: number): string {
           Ubicacion: result.ubicacion || null,
           FechaInicioEstimado: result.fechaInicioEstimado || null,
           FechaFinEstimado: result.fechaFinEstimado || null,
-          Prioridad: result.prioridad ?? 1,
+          Prioridad: result.prioridad,
           AttachmentRequerido: result.attachmentRequerido || false,
           UbicacionRequeridaAlCerrar: result.ubicacionRequeridaAlCerrar || false
         };

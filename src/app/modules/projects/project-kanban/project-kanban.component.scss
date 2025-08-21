@@ -88,3 +88,9 @@
   right: 16px;
   z-index: 1000; /* sobre otros elementos */
 }
+.kanban-card button {
+  margin-left: 8px;
+}
+.kanban-card mat-icon {
+  font-size: 20px;
+}

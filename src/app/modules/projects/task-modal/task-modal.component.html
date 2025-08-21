@@ -44,12 +44,15 @@
     </mat-error>
   </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Prioridad</mat-label>
-    <mat-select formControlName="prioridad">
-      <mat-option *ngFor="let p of prioridades" [value]="p.value">{{ p.label }}</mat-option>
-    </mat-select>
-  </mat-form-field>
+<mat-form-field appearance="fill">
+  <mat-label>Prioridad</mat-label>
+  <mat-select formControlName="prioridad">
+    <mat-option [value]="0">Baja</mat-option>
+    <mat-option [value]="1">Media</mat-option>
+    <mat-option [value]="2">Alta</mat-option>
+  </mat-select>
+</mat-form-field>
+
 
   <mat-checkbox formControlName="attachmentRequerido">Attachment Requerido</mat-checkbox>
   <mat-checkbox formControlName="ubicacionRequeridaAlCerrar">Ubicación Requerida Al Cerrar</mat-checkbox>

@@ -16,6 +16,7 @@ export interface Tarea {
   fechaInicioEstimado: string;
   fechaFinEstimado?: string;
   estado: number;
+  prioridad:number;
   proyectoId: number;
 }
 
